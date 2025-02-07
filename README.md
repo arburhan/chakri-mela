@@ -1,8 +1,8 @@
-# Next.js & HeroUI Template
+# Chakri Mela
 
-This is a template for creating applications using Next.js 14 (app directory) and HeroUI (v2).
+This is my 3rd year university project, named Chakri Mela. It is a platform where people can find offline jobs, job posters can post jobs, and job seekers can find jobs with time and detailed information.
 
-[Try it on CodeSandbox](https://githubbox.com/heroui-inc/heroui/next-app-template)
+
 
 ## Technologies Used
 
@@ -12,7 +12,7 @@ This is a template for creating applications using Next.js 14 (app directory) an
 - [Tailwind Variants](https://tailwind-variants.org)
 - [TypeScript](https://www.typescriptlang.org/)
 - [Framer Motion](https://www.framer.com/motion/)
-- [next-themes](https://github.com/pacocoursey/next-themes)
+
 
 ## How to Use
 
