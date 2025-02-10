@@ -1,141 +1,71 @@
+'use client'
+import { useState } from 'react';
+import Link from 'next/link';
 import {
-  Navbar as HeroUINavbar,
-  NavbarContent,
-  NavbarMenu,
-  NavbarMenuToggle,
-  NavbarBrand,
-  NavbarItem,
-  NavbarMenuItem,
-} from "@heroui/navbar";
-import { Button } from "@heroui/button";
-import { Kbd } from "@heroui/kbd";
-import { Link } from "@heroui/link";
-import { Input } from "@heroui/input";
-import { link as linkStyles } from "@heroui/theme";
-import NextLink from "next/link";
-import clsx from "clsx";
+  FaBars,
+  FaTimes,
+  FaUser,
+  FaBell,
+  FaSearch,
+  FaEnvelope,
+  FaBriefcase,
+  FaUsers,
+  FaProjectDiagram,
+  FaBook
+} from 'react-icons/fa';
 
-import { siteConfig } from "@/config/site";
-import { ThemeSwitch } from "@/components/theme-switch";
-import {
-  TwitterIcon,
-  GithubIcon,
-  DiscordIcon,
-  HeartFilledIcon,
-  SearchIcon,
-  Logo,
-} from "@/components/icons";
-
-export const Navbar = () => {
-  const searchInput = (
-    <Input
-      aria-label="Search"
-      classNames={{
-        inputWrapper: "bg-default-100",
-        input: "text-sm",
-      }}
-      endContent={
-        <Kbd className="hidden lg:inline-block" keys={["command"]}>
-          K
-        </Kbd>
-      }
-      labelPlacement="outside"
-      placeholder="Search..."
-      startContent={
-        <SearchIcon className="text-base text-default-400 pointer-events-none flex-shrink-0" />
-      }
-      type="search"
-    />
-  );
+const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <HeroUINavbar maxWidth="xl" position="sticky">
-      <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
-        <NavbarBrand as="li" className="gap-3 max-w-fit">
-          <NextLink className="flex justify-start items-center gap-1" href="/">
-            <Logo />
-            <p className="font-bold text-inherit">ACME</p>
-          </NextLink>
-        </NavbarBrand>
-        <ul className="hidden lg:flex gap-4 justify-start ml-2">
-          {siteConfig.navItems.map((item) => (
-            <NavbarItem key={item.href}>
-              <NextLink
-                className={clsx(
-                  linkStyles({ color: "foreground" }),
-                  "data-[active=true]:text-primary data-[active=true]:font-medium",
-                )}
-                color="foreground"
-                href={item.href}
-              >
-                {item.label}
-              </NextLink>
-            </NavbarItem>
-          ))}
-        </ul>
-      </NavbarContent>
+    <nav className="bg-white shadow-md fixed w-full z-50">
+      <div className="max-w-7xl mx-auto px-4 flex justify-between items-center h-16">
+        <Link href="/" className="text-blue-600 text-2xl font-bold">Chakri-Mela</Link>
 
-      <NavbarContent
-        className="hidden sm:flex basis-1/5 sm:basis-full"
-        justify="end"
-      >
-        <NavbarItem className="hidden sm:flex gap-2">
-          <Link isExternal aria-label="Twitter" href={siteConfig.links.twitter}>
-            <TwitterIcon className="text-default-500" />
-          </Link>
-          <Link isExternal aria-label="Discord" href={siteConfig.links.discord}>
-            <DiscordIcon className="text-default-500" />
-          </Link>
-          <Link isExternal aria-label="Github" href={siteConfig.links.github}>
-            <GithubIcon className="text-default-500" />
-          </Link>
-          <ThemeSwitch />
-        </NavbarItem>
-        <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
-        <NavbarItem className="hidden md:flex">
-          <Button
-            isExternal
-            as={Link}
-            className="text-sm font-normal text-default-600 bg-default-100"
-            href={siteConfig.links.sponsor}
-            startContent={<HeartFilledIcon className="text-danger" />}
-            variant="flat"
-          >
-            Sponsor
-          </Button>
-        </NavbarItem>
-      </NavbarContent>
-
-      <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
-        <Link isExternal aria-label="Github" href={siteConfig.links.github}>
-          <GithubIcon className="text-default-500" />
-        </Link>
-        <ThemeSwitch />
-        <NavbarMenuToggle />
-      </NavbarContent>
-
-      <NavbarMenu>
-        {searchInput}
-        <div className="mx-4 mt-2 flex flex-col gap-2">
-          {siteConfig.navMenuItems.map((item, index) => (
-            <NavbarMenuItem key={`${item}-${index}`}>
-              <Link
-                color={
-                  index === 2
-                    ? "primary"
-                    : index === siteConfig.navMenuItems.length - 1
-                      ? "danger"
-                      : "foreground"
-                }
-                href="#"
-                size="lg"
-              >
-                {item.label}
-              </Link>
-            </NavbarMenuItem>
-          ))}
+        <div className="hidden md:flex space-x-8">
+          <Link href="/jobs" className="text-gray-700 hover:text-blue-600 transition duration-300">Jobs</Link>
+          <Link href="/talent" className="text-gray-700 hover:text-blue-600 transition duration-300">Talent</Link>
+          <Link href="/projects" className="text-gray-700 hover:text-blue-600 transition duration-300">Projects</Link>
+          <Link href="/resources" className="text-gray-700 hover:text-blue-600 transition duration-300">Resources</Link>
         </div>
-      </NavbarMenu>
-    </HeroUINavbar>
+
+        <div className="hidden md:flex items-center space-x-6">
+          {/* <FaSearch className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-300" />
+          <FaEnvelope className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-300" />
+          <FaBell className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-300" />
+          <FaUser className="text-gray-700 hover:text-blue-600 cursor-pointer transition duration-300" /> */}
+          <Link href="/login" className="text-blue-600 px-4 py-2 rounded-md bg-blue-100 transition duration-300">Sign In</Link>
+          {/* <Link href="/register" className="bg-blue-100 text-black px-4 py-2 rounded-md hover:bg-blue-700 hover:text-white transition duration-300">Sign Up Now</Link> */}
+        </div>
+
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="md:hidden text-gray-700 hover:text-blue-600 focus:outline-none transition duration-300"
+        >
+          {isOpen ? <FaTimes className="h-6 w-6" /> : <FaBars className="h-6 w-6" />}
+        </button>
+      </div>
+
+      {isOpen && (
+        <div className="md:hidden bg-white shadow-lg">
+          <div className="px-2 pt-2 pb-3 space-y-1">
+            <Link href="/jobs" className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition duration-300">Jobs</Link>
+            <Link href="/talent" className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition duration-300">Talent</Link>
+            <Link href="/projects" className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition duration-300">Projects</Link>
+            <Link href="/resources" className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition duration-300">Resources</Link>
+            {/* <Link href="/search" className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition duration-300">Search</Link>
+            <Link href="/messages" className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition duration-300">Messages</Link>
+            <Link href="/notifications" className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition duration-300">Notifications</Link>
+            <Link href="/profile" className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition duration-300">Profile</Link> */}
+            <div className="flex flex-col space-y-2 mt-4">
+              {/*  <Link href="/register" className="w-full text-blue-600 px-4 py-2 rounded-md bg-blue-50 text-center transition duration-300">Sign Up Now</Link> */}
+              <Link href="/login" className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-center transition duration-300">Sign in</Link>
+            </div>
+          </div>
+        </div>
+      )}
+    </nav>
   );
 };
+
+export default Navbar;
