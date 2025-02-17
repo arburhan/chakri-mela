@@ -1,4 +1,5 @@
 import { SearchIcon } from '@/components/icons';
+import { categories } from '@/public/data';
 import React from 'react';
 
 
@@ -107,20 +108,8 @@ const Home = () => {
   );
 };
 
-// Sample data
-const categories = [
-  { name: "Plumbing", count: "1,234", icon: "🔧" },
-  { name: "Electrical Work", count: "867", icon: "💡" },
-  { name: "Carpentry", count: "2,156", icon: "🖼️" },
-  { name: "Painting", count: "1,543", icon: "🎨" },
-  { name: "Cleaning", count: "976", icon: "🧹" },
-  { name: "Landscaping", count: "654", icon: "🌳" },
-  { name: "Moving Services", count: "432", icon: "🚚" },
-  { name: "Home Repair", count: "876", icon: "🔨" },
-  { name: "Shop Management", count: "1,234", icon: "🏪" },
-  { name: "Medicine Shop", count: "867", icon: "💊" },
-  { name: "Clothing Store", count: "2,156", icon: "👗" }
-];
+
+
 
 const steps = [
   {
