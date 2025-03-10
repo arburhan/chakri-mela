@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
         const { name, email, password, role } = body;
 
         // Validate input
-        if (!name || !email || !password) {
+        if (!name || !email || !password || !role) {
             return NextResponse.json(
                 { message: "Please provide all required fields" },
                 { status: 400 }
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
             name,
             email,
             password,
-            role: role || "SEEKER"
+            role: role
         });
 
         console.log(`User registered: ${user.email} (${user._id})`);

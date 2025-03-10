@@ -5,14 +5,6 @@ import Link from 'next/link';
 import {
     FaBars,
     FaTimes,
-    FaUser,
-    FaBell,
-    FaSearch,
-    FaEnvelope,
-    FaBriefcase,
-    FaUsers,
-    FaProjectDiagram,
-    FaBook
 } from 'react-icons/fa';
 import { signOut } from 'next-auth/react';
 interface NavcompProps {
@@ -25,7 +17,6 @@ interface NavcompProps {
 }
 
 const Navcomp: React.FC<NavcompProps> = ({ session }) => {
-
 
     const [isOpen, setIsOpen] = useState(false);
     const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -61,7 +52,8 @@ const Navcomp: React.FC<NavcompProps> = ({ session }) => {
                                     {isProfileMenuOpen && (
                                         <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5">
                                             <div className="px-4 py-2 text-sm text-gray-700">
-                                                {session?.name}
+                                                <p>{session?.name}</p>
+                                                <p>role: {session?.role}</p>
                                             </div>
                                             <div className="border-t border-gray-100"></div>
                                             <button
