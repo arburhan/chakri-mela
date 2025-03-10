@@ -1,51 +1,78 @@
-// app/api/auth/[...nextauth]/route.ts
-
-import NextAuth, { NextAuthOptions } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
+/* eslint-disable */
 import User from "@/models/user";
 import connectDB from "@/utils/connectDB";
+import NextAuth from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { NextAuthOptions } from "next-auth";
+import { Document } from 'mongoose';
 
-interface Credentials {
+// Define the User interface
+interface IUser extends Document {
+    _id: string;
+    name: string;
     email: string;
     password: string;
+    role: string;
+    matchPassword(enteredPassword: string): Promise<boolean>;
 }
 
-export const authOptions: NextAuthOptions = {
+const authOptions: NextAuthOptions = {
+    session: {
+        strategy: "jwt",
+        maxAge: 30 * 24 * 60 * 60, // 30 days
+    },
+    secret: process.env.NEXTAUTH_SECRET,
+    pages: {
+        signIn: "/auth/login",
+        error: "/auth/login",
+    },
+    debug: process.env.NODE_ENV === "development",
     providers: [
         CredentialsProvider({
-            name: "credentials",
-            credentials: {},
-            async authorize(credentials): Promise<any> {
-                const { email, password } = credentials as Credentials;
-
+            name: "Credentials",
+            credentials: {
+                email: { label: "Email", type: "email" },
+                password: { label: "Password", type: "password" },
+            },
+            async authorize(credentials) {
                 try {
-                    await connectDB();
+                    if (!credentials?.email || !credentials?.password) {
+                        throw new Error("Missing credentials");
+                    }
 
-                    const user = await User.findOne({ email });
+                    // Connect to the database using your connection function
+                    const mongoose = await connectDB();
+                    console.log("MongoDB connection status:", mongoose.connection.readyState);
+
+                    // Find the user by email and explicitly type it as IUser
+                    const user = await User.findOne({
+                        email: credentials.email.toLowerCase()
+                    }).select('+password') as IUser | null;
+
+                    console.log("User lookup result:", user ? "User found" : "User not found");
 
                     if (!user) {
                         throw new Error("No user found with this email");
                     }
 
-                    const passwordsMatch = await bcrypt.compare(password, user.password);
+                    // Check if the password matches
+                    const isMatch = await user.matchPassword(credentials.password);
+                    console.log("Password match:", isMatch);
 
-                    if (!passwordsMatch) {
-                        throw new Error("Incorrect password");
+                    if (!isMatch) {
+                        throw new Error("Invalid password");
                     }
 
+                    // Return the user object without sensitive information
                     return {
-                        id: user.id.toString(),
+                        id: user._id.toString(),
                         name: user.name,
                         email: user.email,
+                        role: user.role,
                     };
-                } catch (error) {
-                    if (error instanceof Error) {
-                        console.error("Authentication error:", error.message);
-                        throw new Error(error.message);
-                    }
-                    console.error("Unexpected error during authentication:", error);
-                    throw new Error("An unexpected error occurred");
+                } catch (error: any) {
+                    console.error("Authentication error:", error);
+                    throw error;
                 }
             },
         }),
@@ -54,24 +81,42 @@ export const authOptions: NextAuthOptions = {
         async jwt({ token, user }) {
             if (user) {
                 token.id = user.id;
+                token.name = user.name;
+                token.email = user.email;
+                token.role = user.role;
             }
             return token;
         },
         async session({ session, token }) {
             if (session.user) {
-                (session.user as any).id = token.id;
+                session.user.id = token.id as string;
+                session.user.name = token.name as string;
+                session.user.email = token.email as string;
+                session.user.role = token.role as string;
             }
             return session;
         },
     },
-    session: {
-        strategy: "jwt",
-    },
-    secret: process.env.NEXTAUTH_SECRET,
-    pages: {
-        signIn: "/auth/login",
-    },
 };
+
+// Extend the built-in session types
+declare module "next-auth" {
+    interface Session {
+        user: {
+            id: string;
+            name: string;
+            email: string;
+            role: string;
+        };
+    }
+
+    interface User {
+        id: string;
+        name: string;
+        email: string;
+        role: string;
+    }
+}
 
 const handler = NextAuth(authOptions);
 

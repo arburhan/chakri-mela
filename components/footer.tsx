@@ -1,9 +1,7 @@
 /* eslint-disable */
 import Link from 'next/link';
 import {
-
     FaLinkedinIn,
-
     FaInstagramSquare,
     FaYoutubeSquare,
     FaTwitterSquare,

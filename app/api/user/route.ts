@@ -1,79 +1,64 @@
-// app/api/users/route.ts
-
+/* eslint-disable */
 import { NextRequest, NextResponse } from "next/server";
-import { hash } from 'bcryptjs';
-import User from "@/models/user";
 import connectDB from "@/utils/connectDB";
+import User from "@/models/user";
 
-// Interface for the request body
-interface CreateUserRequest {
-    name: string;
-    email: string;
-    password: string;
-}
-
-export async function GET(): Promise<NextResponse> {
+export async function POST(request: NextRequest) {
     try {
+        // Connect to the database
         await connectDB();
-        const users = await User.find().select('-password');
 
-        return NextResponse.json({ users });
-    } catch (error) {
-        return NextResponse.json(
-            { error: "Failed to fetch users" },
-            { status: 500 }
-        );
-    }
-}
+        // Parse request body
+        const body = await request.json();
+        console.log("Registration request:", { ...body, password: "REDACTED" });
 
-export async function POST(request: NextRequest): Promise<NextResponse> {
-    try {
-        const { name, email, password }: CreateUserRequest = await request.json();
+        const { name, email, password, role } = body;
 
         // Validate input
-        if (!name || !email || !password) {
+        if (!name || !email || !password || !role) {
             return NextResponse.json(
-                { message: "Missing required fields" },
+                { message: "Please provide all required fields" },
                 { status: 400 }
             );
         }
 
-        await connectDB();
-
-        // Check for existing user
+        // Check if user already exists
         const existingUser = await User.findOne({ email });
-
         if (existingUser) {
             return NextResponse.json(
                 { message: "User already exists" },
-                { status: 422 }
+                { status: 400 }
             );
         }
 
-        // Hash password and create user
-        const hashedPassword = await hash(password, 12);
-
-        const newUser = await User.create({
+        // Create a new user (password will be hashed by pre-save middleware)
+        const user = await User.create({
             name,
             email,
-            password: hashedPassword,
+            password,
+            role: role
         });
 
-        // Remove password from response
-        const { password: _, ...userWithoutPassword } = newUser.toObject();
+        console.log(`User registered: ${user.email} (${user._id})`);
 
+        // Return success response (excluding password)
         return NextResponse.json(
             {
                 message: "User registered successfully",
-                user: userWithoutPassword
+                user: {
+                    id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role
+                }
             },
             { status: 201 }
         );
-    } catch (error) {
-        console.error('Registration error:', error);
 
+    } catch (error: any) {
+        console.error("Registration error:", error);
         return NextResponse.json(
-            { message: "Error creating user" },
+            { message: error.message || "User registration failed" },
             { status: 500 }
         );
     }
