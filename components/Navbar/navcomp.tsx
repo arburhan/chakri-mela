@@ -28,7 +28,7 @@ const Navcomp: React.FC<NavcompProps> = ({ session }) => {
                 <Link href="/" className="text-blue-600 text-2xl font-bold">Chakri-Mela</Link>
 
                 <div className="hidden md:flex space-x-8">
-                    <Link href="/jobs" className="text-gray-700 hover:text-blue-600 transition duration-300">Jobs</Link>
+                    <Link href="/find-work" className="text-gray-700 hover:text-blue-600 transition duration-300">Jobs</Link>
                     <Link href="/talent" className="text-gray-700 hover:text-blue-600 transition duration-300">Talent</Link>
                     <Link href="/projects" className="text-gray-700 hover:text-blue-600 transition duration-300">Projects</Link>
                     <Link href="/resources" className="text-gray-700 hover:text-blue-600 transition duration-300">Resources</Link>
