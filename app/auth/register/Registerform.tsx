@@ -35,7 +35,7 @@ const Registerform = () => {
 
         try {
             console.log("Login attempt for:", formData.email);
-            const url = `http://localhost:3000/api/user`;
+            const url = `${process.env.NEXT_PUBLIC_API_URL}/user`;
 
             const res = await fetch(url, {
                 method: "POST",
