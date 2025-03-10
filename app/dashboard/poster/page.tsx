@@ -22,7 +22,7 @@ export default async function PosterDashboardPage() {
             <div className="py-10">
                 <header>
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <h1 className="text-3xl font-bold leading-tight text-gray-900">
+                        <h1 className="text-3xl font-bold leading-tight text-gray-900 py-10">
                             Welcome back, {session.user.name} (Poster)!
                         </h1>
                     </div>
