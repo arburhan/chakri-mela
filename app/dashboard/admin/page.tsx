@@ -1,45 +1,43 @@
 /* eslint-disable */
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
+
 import { Metadata } from 'next';
+import ShortStatics from './shortStatics';
 
 export const metadata: Metadata = {
-    title: 'Admin Dashboard | Your App Name',
-    description: 'Admin dashboard description here',
+    title: 'admin Dashboard | Your App Name',
+    description: 'admin dashboard description here',
 };
 
-export default async function AdminDashboardPage() {
+export default async function DashboardPage() {
     const session = await getServerSession();
 
+    // The middleware already handles role-based routing, so we just need to make sure
+    // there is a session. If not, the middleware should have redirected already,
+    // but this is an extra safety check
     if (!session) {
         redirect('/auth/login');
     }
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className=" bg-gray-100 py-5">
             <div className="py-10">
                 <header>
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <h1 className="text-3xl font-bold leading-tight text-gray-900">
-                            Welcome back, {session.user.name} (Admin)!
+                            Welcome back, {session?.user?.name} (admin)!
                         </h1>
                     </div>
                 </header>
                 <main>
                     <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                        {/* Admin Dashboard Content */}
+                        {/* admin Dashboard Content */}
                         <div className="px-4 py-8 sm:px-0">
                             <div className="border-4 border-dashed border-gray-200 rounded-lg h-96">
                                 {/* Your admin dashboard content goes here */}
                                 <div className="flex items-center justify-center h-full">
-                                    <div className="text-center">
-                                        <h2 className="text-xl font-semibold text-gray-700">
-                                            Admin Dashboard Content
-                                        </h2>
-                                        <p className="mt-2 text-gray-500">
-                                            Add your admin dashboard components here
-                                        </p>
-                                    </div>
+                                    <ShortStatics />
                                 </div>
                             </div>
                         </div>
