@@ -32,7 +32,7 @@ const posterDashboardLayout = ({ children }: { children: React.ReactNode }) => {
                     <li className="flex items-center">
                         <FaHome className="mr-2" />
                         <Link
-                            href="/dashboard/home"
+                            href="/dashboard/poster"
                             className="text-gray-200 hover:text-white"
                             onClick={closeSidebar}
                         >
@@ -42,7 +42,37 @@ const posterDashboardLayout = ({ children }: { children: React.ReactNode }) => {
                     <li className="flex items-center">
                         <FaUser className="mr-2" />
                         <Link
-                            href="/dashboard/profile"
+                            href="/dashboard/poster/profile"
+                            className="text-gray-200 hover:text-white"
+                            onClick={closeSidebar}
+                        >
+                            Profile
+                        </Link>
+                    </li>
+                    <li className="flex items-center">
+                        <FaUser className="mr-2" />
+                        <Link
+                            href="/dashboard/poster/profile"
+                            className="text-gray-200 hover:text-white"
+                            onClick={closeSidebar}
+                        >
+                            Current Jobs
+                        </Link>
+                    </li>
+                    <li className="flex items-center">
+                        <FaUser className="mr-2" />
+                        <Link
+                            href="/dashboard/poster/postNewJob"
+                            className="text-gray-200 hover:text-white"
+                            onClick={closeSidebar}
+                        >
+                            Post New Job
+                        </Link>
+                    </li>
+                    <li className="flex items-center">
+                        <FaUser className="mr-2" />
+                        <Link
+                            href="/dashboard/poster/profile"
                             className="text-gray-200 hover:text-white"
                             onClick={closeSidebar}
                         >
@@ -52,7 +82,7 @@ const posterDashboardLayout = ({ children }: { children: React.ReactNode }) => {
                     <li className="flex items-center">
                         <FaCog className="mr-2" />
                         <Link
-                            href="/dashboard/settings"
+                            href="/dashboard/poster/settings"
                             className="text-gray-200 hover:text-white"
                             onClick={closeSidebar}
                         >

@@ -63,3 +63,29 @@ export async function POST(request: NextRequest) {
         );
     }
 }
+
+
+export async function GET() {
+    try {
+        // Connect to the database
+        await connectDB();
+
+        // Fetch all users
+        const users = await User.find({}, { password: 0 }); // Exclude passwords from the result
+
+        // Return the list of users
+        return NextResponse.json(
+            {
+                message: "Users fetched successfully",
+                users,
+            },
+            { status: 200 }
+        );
+    } catch (error: any) {
+        console.error("Error fetching users:", error);
+        return NextResponse.json(
+            { message: error.message || "Failed to fetch users" },
+            { status: 500 }
+        );
+    }
+}

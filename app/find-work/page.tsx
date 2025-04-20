@@ -1,6 +1,6 @@
 /* eslint-disable */
 'use client'
-import { allJobs, categories } from '@/public/data';
+import { allJobsData, categoriesData } from '@/public/data';
 import React, { useState } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import { FaBriefcase, FaClock, FaFilter, FaMapPin } from 'react-icons/fa6';
@@ -9,7 +9,7 @@ import moment from 'moment';
 
 
 const FindWorkPage = () => {
-    const [selectedCategory, setSelectedCategory] = useState('all');
+    const [selectedCategory, setSelectedCategory] = useState("");
 
     return (
         <div className="min-h-screen bg-gray-50 pt-16 text-black">
@@ -105,21 +105,18 @@ const FindWorkPage = () => {
                                     onChange={(e) => setSelectedCategory(e.target.value)}
                                     className="p-2 border rounded-md"
                                 >
+                                    <option value="all" disabled className='text-white' >All Categories</option>
                                     {
-                                        categories.map((category) => (
+                                        categoriesData.map((category) => (
                                             <option key={category.id} value={category.name}>{category.name}</option>
                                         ))
                                     }
-                                    <option value="all">All Categories</option>
-                                    <option value="development">Development</option>
-                                    <option value="design">Design</option>
-                                    <option value="marketing">Marketing</option>
                                 </select>
                             </div>
 
                             {/* Job Cards */}
                             <div className="space-y-6">
-                                {allJobs.map((job) => (
+                                {allJobsData.map((job) => (
                                     <div key={job.id} className="border rounded-lg p-6 hover:shadow-md transition-shadow">
                                         <div className="flex items-start justify-between mb-4 flex-wrap gap-4">
                                             <div>

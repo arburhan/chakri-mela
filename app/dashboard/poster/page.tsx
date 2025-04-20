@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 
 import { Metadata } from 'next';
+import ShortStatics from './shortStatics';
 
 export const metadata: Metadata = {
     title: 'job poster Dashboard | Your App Name',
@@ -36,14 +37,7 @@ export default async function DashboardPage() {
                             <div className="border-4 border-dashed border-gray-200 rounded-lg h-96">
                                 {/* Your job poster dashboard content goes here */}
                                 <div className="flex items-center justify-center h-full">
-                                    <div className="text-center">
-                                        <h2 className="text-xl font-semibold text-gray-700">
-                                            job poster Dashboard Content
-                                        </h2>
-                                        <p className="mt-2 text-gray-500">
-                                            Add your job poster dashboard components here
-                                        </p>
-                                    </div>
+                                    <ShortStatics />
                                 </div>
                             </div>
                         </div>
