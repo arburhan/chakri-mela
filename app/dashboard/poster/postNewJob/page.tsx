@@ -8,6 +8,7 @@ import { Button } from "@heroui/button";
 
 const Page = () => {
     const [selectedCategory, setSelectedCategory] = useState<string>("");
+    const [submitMessage, setSubmitMessage] = useState<string>("");
 
     const [formData, setFormData] = useState({
         jobTitle: "",
@@ -73,9 +74,47 @@ const Page = () => {
         }));
     };
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log("Form submitted:", formData);
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/poster`;
+        try {
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setSubmitMessage('Form submitted successfully!');
+                // Reset form
+                setFormData({
+                    jobTitle: "",
+                    jobDescription: "",
+                    jobType: "",
+                    workingHour: 0,
+                    salaryRange: {
+                        startRange: 0,
+                        endRange: 0,
+                    },
+                    jobLevel: [] as string[],
+                    skills: [] as string[],
+                });
+            } else {
+                setSubmitMessage(data.message || 'Submission failed');
+            }
+        } catch (error) {
+            setSubmitMessage('Error submitting form');
+            console.error('Submission error:', error);
+        } finally {
+            console.log('successfully submitted');
+        }
+        console.log("Form submitted:", "success");
     };
 
     return (
