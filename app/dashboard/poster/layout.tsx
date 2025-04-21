@@ -52,7 +52,7 @@ const posterDashboardLayout = ({ children }: { children: React.ReactNode }) => {
                     <li className="flex items-center">
                         <FaUser className="mr-2" />
                         <Link
-                            href="/dashboard/poster/profile"
+                            href="/dashboard/poster/currentJob"
                             className="text-gray-200 hover:text-white"
                             onClick={closeSidebar}
                         >

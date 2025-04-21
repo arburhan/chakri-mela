@@ -36,7 +36,8 @@ export async function POST(request: Request) {
             workingHour,
             salaryRange,
             jobLevel,
-            skills
+            skills,
+            status: "active"
         });
         console.log(`Job posted: ${jobPost.jobTitle} (${jobPost._id})`);
         return NextResponse.json(
@@ -49,7 +50,8 @@ export async function POST(request: Request) {
                     workingHour,
                     salaryRange,
                     jobLevel,
-                    skills
+                    skills,
+                    status: "active",
                 }
             },
             { status: 201 }

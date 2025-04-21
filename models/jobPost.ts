@@ -16,6 +16,9 @@ export interface IJobPost extends Document {
     salaryRange: ISalaryRange;
     jobLevel: string[];
     skills: string[];
+    status: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 // Schema for job post
@@ -53,7 +56,13 @@ const JobPostSchema: Schema = new Schema({
     skills: [{
         type: String,
         required: true
-    }]
+    }],
+    status: {
+        type: String,
+        enum: ['active', 'completed', 'expired'],
+        default: 'active',
+        required: true
+    }
 }, {
     timestamps: true
 });
@@ -61,9 +70,7 @@ const JobPostSchema: Schema = new Schema({
 JobPostSchema.pre('save', function (next) {
     // Perform any pre-save operations here if needed
     next();
-}
-);
-
+});
 
 const IJobPost = (mongoose.models.JobPost as Model<IJobPost>) || mongoose.model<IJobPost>("JobPost", JobPostSchema);
 
