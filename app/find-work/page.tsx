@@ -1,15 +1,15 @@
 /* eslint-disable */
-'use client'
-import { allJobs, categories } from '@/public/data';
-import React, { useState } from 'react';
+
+import { categoriesData } from '@/public/data';
+
 import { FaSearch } from 'react-icons/fa';
-import { FaBriefcase, FaClock, FaFilter, FaMapPin } from 'react-icons/fa6';
-import moment from 'moment';
+import { FaFilter, FaMapPin } from 'react-icons/fa6';
+import ActiveWorks from './activeWorks';
 
 
 
-const FindWorkPage = () => {
-    const [selectedCategory, setSelectedCategory] = useState('all');
+const FindWorkPage = async () => {
+
 
     return (
         <div className="min-h-screen bg-gray-50 pt-16 text-black">
@@ -101,61 +101,21 @@ const FindWorkPage = () => {
                             <div className="flex items-center justify-between mb-6 flex-wrap gap-2  text-white">
                                 <h2 className="text-lg font-semibold">Featured Jobs</h2>
                                 <select
-                                    value={selectedCategory}
-                                    onChange={(e) => setSelectedCategory(e.target.value)}
+                                    /*  value={selectedCategory}
+                                     onChange={(e) => setSelectedCategory(e.target.value)} */
                                     className="p-2 border rounded-md"
                                 >
+                                    <option value="all" disabled className='text-white' >All Categories</option>
                                     {
-                                        categories.map((category) => (
+                                        categoriesData.map((category) => (
                                             <option key={category.id} value={category.name}>{category.name}</option>
                                         ))
                                     }
-                                    <option value="all">All Categories</option>
-                                    <option value="development">Development</option>
-                                    <option value="design">Design</option>
-                                    <option value="marketing">Marketing</option>
                                 </select>
                             </div>
 
                             {/* Job Cards */}
-                            <div className="space-y-6">
-                                {allJobs.map((job) => (
-                                    <div key={job.id} className="border rounded-lg p-6 hover:shadow-md transition-shadow">
-                                        <div className="flex items-start justify-between mb-4 flex-wrap gap-4">
-                                            <div>
-                                                <h3 className="text-lg font-semibold mb-2">{job.title}</h3>
-                                                <p className="text-gray-600 mb-2">{job.company}</p>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {job.skills.map((skill) => (
-                                                        <span key={skill} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
-                                                            {skill}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                            <div className="text-right">
-                                                <span className="text-green-600 font-semibold">$8 - $12/hr</span>
-                                                {/* <p className="text-gray-500 text-sm">Remote</p> */}
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center justify-between pt-4 border-t flex-wrap gap-4">
-                                            <div className="flex items-center gap-4 text-sm text-gray-500">
-                                                <span className="flex items-center gap-1">
-                                                    <FaBriefcase className="h-4 w-4" />
-                                                    Full-time
-                                                </span>
-                                                <span className="flex items-center gap-1">
-                                                    <FaClock className="h-4 w-4" />
-                                                    Posted {moment(job.createdAt).fromNow()}
-                                                </span>
-                                            </div>
-                                            <button className="text-blue-600 hover:text-blue-700 font-medium">
-                                                View Details
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
+                            <ActiveWorks />
 
                             {/* Pagination */}
                             <div className="flex justify-center mt-8">

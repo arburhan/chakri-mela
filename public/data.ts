@@ -1,4 +1,4 @@
-export const allJobs = [
+export const allJobsData = [
     {
         id: 1,
         title: 'Experienced Plumber',
@@ -100,16 +100,43 @@ export const allJobs = [
     }
 ];
 
-export const categories = [
-    { id: 1, name: "Plumbing", count: "1,234", icon: "🔧" },
-    { id: 2, name: "Electrical Work", count: "867", icon: "💡" },
-    { id: 3, name: "Carpentry", count: "2,156", icon: "🖼️" },
-    { id: 4, name: "Painting", count: "1,543", icon: "🎨" },
-    { id: 5, name: "Cleaning", count: "976", icon: "🧹" },
-    { id: 6, name: "Landscaping", count: "654", icon: "🌳" },
-    { id: 7, name: "Moving Services", count: "432", icon: "🚚" },
-    { id: 8, name: "Home Repair", count: "876", icon: "🔨" },
-    { id: 9, name: "Shop Management", count: "1,234", icon: "🏪" },
-    { id: 10, name: "Medicine Shop", count: "867", icon: "💊" },
-    { id: 11, name: "Clothing Store", count: "2,156", icon: "👗" }
+export const jobTypeData = [
+    {
+        id: 1,
+        name: "part-time",
+        description: "Part-time jobs are typically less than 30 hours a week and offer flexibility for workers.",
+        icon: "🕒",
+    },
+    {
+        id: 2,
+        name: "full-time",
+        description: "Full-time jobs usually require 30-40 hours a week and often come with benefits.",
+        icon: "🕒",
+    },
+    {
+        id: 3,
+        name: "freelance",
+        description: "Freelance jobs allow workers to take on projects independently, often with flexible hours.",
+        icon: "🕒",
+    },
+    {
+        id: 4,
+        name: "contract",
+        description: "Contract jobs are typically for a specific period or project, often with set terms.",
+        icon: "🕒",
+    }
+];
+
+export const categoriesData = [
+    { id: 1, name: "Plumbing", count: "1,234", icon: "🔧", skills: ["Pipe Repair", "Water Systems", "Leak Detection", "Fixture Installation", "Drain Cleaning"] },
+    { id: 2, name: "Electrical Work", count: "867", icon: "💡", skills: ["Wiring", "Circuit Installation", "Lighting Systems", "Safety Inspection", "Troubleshooting"] },
+    { id: 3, name: "Carpentry", count: "2,156", icon: "🖼️", skills: ["Woodworking", "Cabinet Making", "Furniture Assembly", "Wood Finishing", "Custom Design"] },
+    { id: 4, name: "Painting", count: "1,543", icon: "🎨", skills: ["Interior Painting", "Exterior Painting", "Color Mixing", "Surface Preparation", "Wallpaper Installation"] },
+    { id: 5, name: "Cleaning", count: "976", icon: "🧹", skills: ["Deep Cleaning", "Window Cleaning", "Floor Care", "Sanitization", "Organization"] },
+    { id: 6, name: "Landscaping", count: "654", icon: "🌳", skills: ["Garden Design", "Lawn Maintenance", "Plant Care", "Irrigation Systems", "Hardscaping"] },
+    { id: 7, name: "Moving Services", count: "432", icon: "🚚", skills: ["Packing", "Heavy Lifting", "Furniture Assembly", "Loading/Unloading", "Transport"] },
+    { id: 8, name: "Home Repair", count: "876", icon: "🔨", skills: ["General Maintenance", "Drywall Repair", "Door Installation", "Window Repair", "Basic Carpentry"] },
+    { id: 9, name: "Shop Management", count: "1,234", icon: "🏪", skills: ["Inventory Management", "Staff Supervision", "Customer Service", "Sales Analysis", "Operations Planning"] },
+    { id: 10, name: "Medicine Shop", count: "867", icon: "💊", skills: ["Medication Dispensing", "Health Consultation", "Inventory Control", "Patient Care", "Drug Information"] },
+    { id: 11, name: "Clothing Store", count: "2,156", icon: "👗", skills: ["Fashion Styling", "Visual Merchandising", "Sales Management", "Stock Management", "Customer Relations"] }
 ];
