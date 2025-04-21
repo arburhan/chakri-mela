@@ -9,6 +9,7 @@ interface ISalaryRange {
 
 // Interface for job post document
 export interface IJobPost extends Document {
+    _id: string;
     jobTitle: string;
     jobDescription: string;
     jobType: string;

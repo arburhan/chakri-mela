@@ -43,7 +43,7 @@ const Navcomp: React.FC<NavcompProps> = ({ session }) => {
     }, []);
 
     return (
-        <nav className="bg-white shadow-md fixed w-full z-50">
+        <nav className="bg-white shadow-md w-full">
             <div className="max-w-7xl mx-auto px-4 flex justify-between items-center h-16">
                 <Link href="/" className="text-blue-600 text-2xl font-bold">Chakri-Mela</Link>
 
