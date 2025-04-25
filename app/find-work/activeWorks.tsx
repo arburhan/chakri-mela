@@ -2,7 +2,8 @@
 import React from 'react';
 import type { IJobPost } from '@/models/jobPost';
 import JobCard from './jobCard';
-import getActiveJobs from './jobFetch';
+import { getActiveJobs } from './jobFetch';
+
 
 const ActiveWorks = async () => {
     const jobs: IJobPost[] = await getActiveJobs();

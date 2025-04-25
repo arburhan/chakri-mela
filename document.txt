@@ -1,0 +1,11 @@
+// on job
+1. location
+2. featured or not
+3. project/job length
+
+// each role
+1. review
+2. 
+
+// on dashboard
+1. add button to make featured

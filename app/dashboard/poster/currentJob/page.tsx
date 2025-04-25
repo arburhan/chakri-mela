@@ -1,39 +1,17 @@
 /* eslint-disable */
+import { getActiveJobs } from '@/app/find-work/jobFetch';
+import { IJobPost } from '@/models/jobPost';
 import { Button } from '@heroui/button';
 import React from 'react';
 
-const url = `${process.env.NEXT_PUBLIC_API_URL}/poster`;
-async function getData() {
-    const res = await fetch(url)
-    if (!res.ok) {
-        console.log('Failed to fetch data')
-    }
-    return res.json()
-}
-
-interface JobPost {
-    _id: string;
-    jobTitle: string;
-    jobType: string;
-    workingHour: number;
-    status: string;
-    salaryRange: {
-        startRange: number;
-        endRange: number;
-    };
-}
-
-interface JobData {
-    jobPosts: JobPost[];
-}
+/* const url = `${process.env.NEXT_PUBLIC_API_URL}/poster`;
+ */
 
 const Page = async () => {
-    const allJobs = await getData();
-    const activeJobs: JobPost[] = (allJobs as JobData).jobPosts.filter((job: JobPost) => job.status === 'active');
-    //  console.log('Active jobs:', activeJobs);
-    const activeJob = activeJobs[0]; // Get the first active job
+    const activeJobs: IJobPost[] = await getActiveJobs();
 
-    if (!activeJob) {
+
+    if (!activeJobs) {
         return (
             <div className="flex items-center justify-center min-h-screen">
                 <div className="text-xl font-semibold text-gray-600">
@@ -43,7 +21,7 @@ const Page = async () => {
         );
     }
     const handleComplete = async () => {
-        const res = await fetch(`${url}/${activeJob._id}`, {
+        /* const res = await fetch(`${url}/${activeJob._id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -54,10 +32,10 @@ const Page = async () => {
             console.log('Failed to update job status')
         }
         const updatedJob = await res.json();
-        console.log('Job status updated:', updatedJob);
+        console.log('Job status updated:', updatedJob); */
     }
     const handleDelete = async () => {
-        const res = await fetch(`${url}/${activeJob._id}`, {
+        /* const res = await fetch(`${url}/${activeJob._id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -67,10 +45,10 @@ const Page = async () => {
             console.log('Failed to delete job')
         }
         const deletedJob = await res.json();
-        console.log('Job deleted:', deletedJob);
+        console.log('Job deleted:', deletedJob); */
     }
     const handleEdit = async () => {
-        const res = await fetch(`${url}/${activeJob._id}`, {
+        /* const res = await fetch(`${url}/${activeJob._id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -81,7 +59,7 @@ const Page = async () => {
             console.log('Failed to edit job')
         }
         const editedJob = await res.json();
-        console.log('Job edited:', editedJob);
+        console.log('Job edited:', editedJob); */
     }
 
 

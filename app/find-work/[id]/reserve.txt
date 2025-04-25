@@ -1,0 +1,263 @@
+
+'use client';
+import React, { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { Button } from '@heroui/button';
+import { Textarea } from '@heroui/input';
+
+const JobDetailsPage = () => {
+    const router = useRouter();
+    const params = useParams();
+    const jobId = params?.id;
+
+    const [isLoading, setIsLoading] = useState(true);
+    const [job, setJob] = useState(null);
+    const [error, setError] = useState(null);
+    const [isApplying, setIsApplying] = useState(false);
+    const [coverLetter, setCoverLetter] = useState('');
+
+    useEffect(() => {
+        const fetchJobDetails = async () => {
+            if (!jobId) return;
+
+            setIsLoading(true);
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/poster?id=${jobId}`);
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch job details');
+                }
+
+                const data = await response.json();
+                setJob(data.jobPost);
+            } catch (err) {
+                console.error('Error fetching job details:', err);
+                setError('Failed to load job details. Please try again later.');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchJobDetails();
+    }, [jobId]);
+
+    const handleApply = (e) => {
+        e.preventDefault();
+        // Submit application logic would go here
+        alert('Your application has been submitted!');
+        setIsApplying(false);
+        setCoverLetter('');
+    };
+
+    if (isLoading) {
+        return (
+            <section className="py-8 bg-gray-50 min-h-screen">
+                <div className="container mx-auto px-4 max-w-5xl">
+                    <div className="flex justify-center items-center h-64">
+                        <div className="text-center">
+                            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                            <p className="text-gray-600">Loading job details...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
+    if (error || !job) {
+        return (
+            <section className="py-8 bg-gray-50 min-h-screen">
+                <div className="container mx-auto px-4 max-w-5xl">
+                    <div className="bg-white rounded-lg shadow-sm p-6">
+                        <div className="text-center py-8">
+                            <h2 className="text-2xl font-bold text-red-600 mb-2">Error</h2>
+                            <p className="text-gray-700 mb-4">{error || "Job not found"}</p>
+                            <Button color="primary" onClick={() => router.push('/find-work')}>
+                                Browse All Jobs
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
+    return (
+        <section className="py-8 bg-gray-50">
+            <div className="container mx-auto px-4 max-w-5xl">
+                {/* Breadcrumb */}
+                <div className="mb-6 text-sm">
+                    <span className="text-gray-500 cursor-pointer" onClick={() => router.push('/find-work')}>Jobs</span> {' > '}
+                    <span className="text-blue-600">{job.jobTitle}</span>
+                </div>
+
+                {/* Job Header */}
+                <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+                    <div className="flex flex-col md:flex-row justify-between md:items-start mb-4 gap-4">
+                        <div>
+                            <h1 className="text-2xl font-bold mb-2">{job.jobTitle}</h1>
+                            <div className="flex flex-wrap gap-2 text-sm text-gray-600 mb-4">
+                                <span>{job.jobType}</span>
+                                <span>•</span>
+                                <span>Posted {new Date(job.createdAt).toLocaleDateString()}</span>
+                            </div>
+                        </div>
+                        <div className="flex flex-col items-center">
+                            <Button
+                                color="primary"
+                                size="lg"
+                                onClick={() => setIsApplying(true)}
+                                className="mb-2 w-full md:w-auto"
+                            >
+                                Apply Now
+                            </Button>
+                            <button className="text-gray-500 text-sm block">
+                                Save Job
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-gray-700">
+                        <div>
+                            <div className="font-medium mb-1">Hourly Rate</div>
+                            <div className="text-xl font-bold text-gray-900">
+                                ${job.salaryRange.startRange}-${job.salaryRange.endRange}
+                            </div>
+                            <div className="text-sm text-gray-500">Per Hour</div>
+                        </div>
+                        <div>
+                            <div className="font-medium mb-1">Experience Level</div>
+                            <div className="text-xl font-bold text-gray-900">
+                                {job.jobLevel.join(', ')}
+                            </div>
+                        </div>
+                        <div>
+                            <div className="font-medium mb-1">Hours</div>
+                            <div className="text-xl font-bold text-gray-900">
+                                {job.workingHour} hrs/week
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Main Content */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Left Column - Job Details */}
+                    <div className="lg:col-span-2">
+                        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+                            <h2 className="text-xl font-bold mb-4">Job Description</h2>
+                            <div className="text-gray-700 whitespace-pre-line mb-6">
+                                {job.jobDescription}
+                            </div>
+
+                            <h3 className="text-lg font-bold mb-3">Skills and Expertise</h3>
+                            <div className="flex flex-wrap gap-2 mb-6">
+                                {job.skills.map((skill, index) => (
+                                    <span
+                                        key={`${job._id}-skill-${index}`}
+                                        className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-sm"
+                                    >
+                                        {skill}
+                                    </span>
+                                ))}
+                            </div>
+
+                            <h3 className="text-lg font-bold mb-3">About This Job</h3>
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <div className="font-medium">Posted On</div>
+                                    <div>{new Date(job.createdAt).toLocaleDateString()}</div>
+                                </div>
+                                <div>
+                                    <div className="font-medium">Category</div>
+                                    <div>{job.category || "Development & IT"}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Application Section */}
+                        {isApplying && (
+                            <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+                                <h2 className="text-xl font-bold mb-4">Submit a Proposal</h2>
+                                <form onSubmit={handleApply}>
+                                    <div className="mb-4">
+                                        <label className="block text-gray-700 text-sm font-bold mb-2">
+                                            Cover Letter
+                                        </label>
+                                        <Textarea
+                                            required
+                                            rows={6}
+                                            placeholder="Introduce yourself and explain why you're a good fit for this job..."
+                                            className="w-full"
+                                            value={coverLetter}
+                                            onChange={(e) => setCoverLetter(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <Button type="submit" color="primary">
+                                            Submit Proposal
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            color="secondary"
+                                            onClick={() => setIsApplying(false)}
+                                        >
+                                            Cancel
+                                        </Button>
+                                    </div>
+                                </form>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Right Column - Client Info */}
+                    <div className="lg:col-span-1">
+                        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+                            <h2 className="text-xl font-bold mb-4">About the Client</h2>
+
+                            <div className="flex items-center mb-4">
+                                <div className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold text-xl mr-3">
+                                    {job.companyName ? job.companyName.charAt(0) : "C"}
+                                </div>
+                                <div>
+                                    <div className="font-bold">{job.companyName || "Company"}</div>
+                                    <div className="text-sm text-gray-600">{job.location || "Remote"}</div>
+                                </div>
+                            </div>
+
+                            <hr className="my-4" />
+
+                            <div className="space-y-3 text-sm">
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Job Status</span>
+                                    <span className="font-medium px-2 py-1 bg-green-100 text-green-800 rounded">
+                                        {job.status || "Active"}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Job Type</span>
+                                    <span className="font-medium">{job.jobType}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-lg shadow-sm p-6">
+                            <h2 className="text-lg font-bold mb-3">Similar Jobs</h2>
+                            <p className="text-gray-600 text-sm">
+                                Browse more {job.jobType} opportunities
+                            </p>
+                            <Button
+                                color="secondary"
+                                className="w-full mt-4"
+                                onClick={() => router.push('/find-work')}
+                            >
+                                Find Similar Jobs
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+};
+export default JobDetailsPage;  

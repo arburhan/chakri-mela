@@ -34,7 +34,7 @@ const Registerform = () => {
         setIsLoading(true);
 
         try {
-            console.log("Login attempt for:", formData.email);
+            // console.log("Login attempt for:", formData.email);
             const url = `${process.env.NEXT_PUBLIC_API_URL}/user`;
 
             const res = await fetch(url, {
@@ -43,7 +43,7 @@ const Registerform = () => {
                     "Accept": "application/json",
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify(formData) // Ensure formData is correctly formatted
+                body: JSON.stringify(formData)
             });
 
             const data = await res.json();

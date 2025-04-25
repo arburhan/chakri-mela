@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
 
         // Parse request body
         const body = await request.json();
-        console.log("Registration request:", { ...body, password: "REDACTED" });
+        //  console.log("Registration request:", { ...body, password: "REDACTED" });
 
         const { name, email, password, role } = body;
 
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
             role: role
         });
 
-        console.log(`User registered: ${user.email} (${user._id})`);
+        //  console.log(`User registered: ${user.email} (${user._id})`);
 
         // Return success response (excluding password)
         return NextResponse.json(
