@@ -32,7 +32,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                     <li className="flex items-center">
                         <FaHome className="mr-2" />
                         <Link
-                            href="/dashboard/home"
+                            href="/dashboard/seeker"
                             className="text-gray-200 hover:text-white"
                             onClick={closeSidebar}
                         >
@@ -42,7 +42,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                     <li className="flex items-center">
                         <FaUser className="mr-2" />
                         <Link
-                            href="/dashboard/profile"
+                            href="/dashboard/seeker/profile"
                             className="text-gray-200 hover:text-white"
                             onClick={closeSidebar}
                         >

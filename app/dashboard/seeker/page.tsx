@@ -12,6 +12,7 @@ export const metadata: Metadata = {
 export default async function SeekerDashboardPage() {
     const session = await getServerSession();
 
+
     // The middleware already handles role-based routing, so we just need to make sure
     // there is a session. If not, the middleware should have redirected already,
     // but this is an extra safety check
