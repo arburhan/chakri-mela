@@ -229,8 +229,8 @@ const Page = () => {
                                 value={formData.jobType}
                                 onChange={(e) => handleSelectChange("jobType", e.target.value)}
                             >
-                                {jobTypeData.map((type) => (
-                                    <SelectItem key={type.name} data-value={type.name}>{type.name}</SelectItem>
+                                {jobTypeData.map((type, index) => (
+                                    <SelectItem key={index} data-value={type.name}>{type.name}</SelectItem>
                                 ))}
                             </Select>
                         </div>
@@ -262,7 +262,7 @@ const Page = () => {
                                 {categoriesData.map((category) => (
                                     <SelectItem
                                         color="warning"
-                                        key={category.name}
+                                        key={category.id}
                                         data-value={category.name}
                                     >
                                         {category.name}
@@ -286,9 +286,9 @@ const Page = () => {
                                         onChange={(values) => handleCheckboxGroupChange("skills", values)}
                                     >
                                         {categoriesData
-                                            .find((cat) => cat.name === jobCategory)?.skills?.map((skill) => (
+                                            .find((cat) => cat.name === jobCategory)?.skills?.map((skill, index) => (
                                                 <Checkbox
-                                                    key={skill}
+                                                    key={index}
                                                     value={skill}
                                                     color="warning"
                                                     classNames={{
@@ -345,8 +345,8 @@ const Page = () => {
                                 value={formData.jobLevel}
                                 onChange={(values) => handleCheckboxGroupChange("jobLevel", values)}
                             >
-                                {['Entry Level', 'Intermediate', 'Expert'].map((level) => (
-                                    <Checkbox key={level} value={level} className="text-white">
+                                {['Entry Level', 'Intermediate', 'Expert'].map((level, index) => (
+                                    <Checkbox key={index} value={level} className="text-white">
                                         {level}
                                     </Checkbox>
                                 ))}

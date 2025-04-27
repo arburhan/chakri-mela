@@ -6,21 +6,22 @@ import { FaBriefcase, FaClock, FaHeart } from 'react-icons/fa6';
 import moment from 'moment';
 import { FaTimes } from 'react-icons/fa';
 import { Button } from '@heroui/button';
+import { useRouter } from 'next/navigation';
 
 interface JobCardProps {
     job: IJobPost;
 }
 
 const JobCard = ({ job }: JobCardProps) => {
+    const router = useRouter();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isFavorite, setIsFavorite] = useState(false);
     const modalRef = useRef<HTMLDivElement>(null);
 
-    // Open job details modal
+    // Handle job view modal
     const handleJobView = (jobId: string) => {
         setIsModalOpen(true);
-        document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
-        // console.log(`Viewing job with ID: ${jobId}`);
+        document.body.style.overflow = 'hidden';
     };
 
     // Close job details modal
@@ -69,6 +70,10 @@ const JobCard = ({ job }: JobCardProps) => {
             document.removeEventListener('keydown', handleEscKey);
         };
     }, [isModalOpen]);
+
+    const handleApply = () => {
+        router.push(`/find-work/${job._id}/apply`);
+    }
 
     return (
         <>
@@ -181,7 +186,7 @@ const JobCard = ({ job }: JobCardProps) => {
                                     <h3 className="font-semibold mb-2 text-gray-700">Job Level</h3>
                                     <div className="flex flex-wrap gap-2">
                                         {job.jobLevel.map((level, index) => (
-                                            <span key={`${level}-${index}`} className="bg-gray-100 text-gray-700 text-xs font-medium px-2.5 py-1 rounded-full">
+                                            <span key={`${index}`} className="bg-gray-100 text-gray-700 text-xs font-medium px-2.5 py-1 rounded-full">
                                                 {level}
                                             </span>
                                         ))}
@@ -203,7 +208,7 @@ const JobCard = ({ job }: JobCardProps) => {
 
                         {/* Modal Footer */}
                         <div className="border-t border-gray-200 p-4 bg-white">
-                            <Button className='bg-blue-700 w-full mb-10'>Apply Now</Button>
+                            <Button onPress={handleApply} className='bg-blue-700 w-full mb-10'>Apply Now</Button>
                         </div>
                     </div>
                 </div>

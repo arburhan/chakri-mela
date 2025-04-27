@@ -492,9 +492,9 @@ const JobSeekerProfile = () => {
                                                         });
                                                     }}
                                                 >
-                                                    {categorySkills.map((skill) => (
+                                                    {categorySkills.map((skill, index) => (
                                                         <Checkbox
-                                                            key={skill}
+                                                            key={index}
                                                             value={skill}
                                                             color="warning"
                                                             isSelected={formData.skills.includes(skill)}

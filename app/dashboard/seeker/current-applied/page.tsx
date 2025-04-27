@@ -30,9 +30,9 @@ const currentApplied = () => {
         <div className="p-6 bg-gray-100 min-h-screen">
             <h1 className="text-2xl font-bold text-gray-800 mb-6">Current Applied Jobs</h1>
             <div className="space-y-4">
-                {jobs.map((job) => (
+                {jobs.map((job, index) => (
                     <div
-                        key={job.id}
+                        key={index}
                         className="bg-white shadow-md rounded-lg p-4 flex justify-between items-center"
                     >
                         <div>

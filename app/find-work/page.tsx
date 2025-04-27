@@ -58,8 +58,8 @@ const FindWorkPage = async () => {
                                 <div>
                                     <h3 className="font-medium mb-3">Job Type</h3>
                                     <div className="space-y-2">
-                                        {['Full-time', 'Part-time', 'Contract'].map((type) => (
-                                            <label key={type} className="flex items-center gap-2">
+                                        {['Full-time', 'Part-time', 'Contract'].map((type, index) => (
+                                            <label key={index} className="flex items-center gap-2">
                                                 <input type="checkbox" className="rounded text-blue-600" />
                                                 <span>{type}</span>
                                             </label>
@@ -71,8 +71,8 @@ const FindWorkPage = async () => {
                                 <div>
                                     <h3 className="font-medium mb-3">Experience Level</h3>
                                     <div className="space-y-2">
-                                        {['Entry Level', 'Intermediate', 'Expert'].map((level) => (
-                                            <label key={level} className="flex items-center gap-2">
+                                        {['Entry Level', 'Intermediate', 'Expert'].map((level, index) => (
+                                            <label key={index} className="flex items-center gap-2">
                                                 <input type="checkbox" className="rounded text-blue-600" />
                                                 <span>{level}</span>
                                             </label>
