@@ -16,8 +16,15 @@ export interface IJobPost extends Document {
     workingHour: number;
     salaryRange: ISalaryRange;
     jobLevel: string[];
+    jobCategory: string;
     skills: string[];
     status: string;
+    jobLocation: {
+        city: string;
+        state: string;
+        country: string;
+    };
+    posterID: mongoose.Schema.Types.ObjectId;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -54,6 +61,10 @@ const JobPostSchema: Schema = new Schema({
         type: String,
         required: true
     }],
+    jobCategory: {
+        type: String,
+        required: true
+    },
     skills: [{
         type: String,
         required: true
@@ -63,7 +74,26 @@ const JobPostSchema: Schema = new Schema({
         enum: ['active', 'completed', 'expired'],
         default: 'active',
         required: true
-    }
+    },
+    jobLocation: {
+        city: {
+            type: String,
+            required: true
+        },
+        state: {
+            type: String,
+            required: true
+        },
+        country: {
+            type: String,
+            required: true
+        }
+    },
+    posterID: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
 }, {
     timestamps: true
 });

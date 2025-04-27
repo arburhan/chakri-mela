@@ -2,6 +2,9 @@
 'use client';
 import Link from 'next/link';
 import { FaHome, FaUser, FaCog, FaSignOutAlt } from 'react-icons/fa';
+import { BiCurrentLocation } from "react-icons/bi";
+import { GiRunningNinja } from "react-icons/gi";
+
 import { useState } from 'react';
 import { RiMenu2Line } from "react-icons/ri";
 
@@ -50,23 +53,24 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                         </Link>
                     </li>
                     <li className="flex items-center">
-                        <FaCog className="mr-2" />
+
+                        <BiCurrentLocation className="mr-2" />
                         <Link
-                            href="/dashboard/settings"
+                            href="/dashboard/seeker/current-applied"
                             className="text-gray-200 hover:text-white"
                             onClick={closeSidebar}
                         >
-                            Settings
+                            Current Applied
                         </Link>
                     </li>
                     <li className="flex items-center">
-                        <FaSignOutAlt className="mr-2" />
+                        <GiRunningNinja className='mr-2' />
                         <Link
                             href="/logout"
                             className="text-gray-200 hover:text-white"
                             onClick={closeSidebar}
                         >
-                            Logout
+                            Active Jobs
                         </Link>
                     </li>
                 </ul>

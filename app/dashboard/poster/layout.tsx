@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { FaHome, FaUser, FaCog, FaSignOutAlt } from 'react-icons/fa';
 import { useState } from 'react';
 import { RiMenu2Line } from "react-icons/ri";
+import { MdPublish } from 'react-icons/md';
+import { BiCurrentLocation } from 'react-icons/bi';
 
 const posterDashboardLayout = ({ children }: { children: React.ReactNode }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -50,7 +52,7 @@ const posterDashboardLayout = ({ children }: { children: React.ReactNode }) => {
                         </Link>
                     </li>
                     <li className="flex items-center">
-                        <FaUser className="mr-2" />
+                        <BiCurrentLocation className="mr-2" />
                         <Link
                             href="/dashboard/poster/currentJob"
                             className="text-gray-200 hover:text-white"
@@ -60,7 +62,7 @@ const posterDashboardLayout = ({ children }: { children: React.ReactNode }) => {
                         </Link>
                     </li>
                     <li className="flex items-center">
-                        <FaUser className="mr-2" />
+                        <MdPublish className='mr-2' />
                         <Link
                             href="/dashboard/poster/postNewJob"
                             className="text-gray-200 hover:text-white"

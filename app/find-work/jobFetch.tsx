@@ -5,11 +5,11 @@ interface JobData {
     jobPosts: IJobPost[];
 }
 
-const url = `${process.env.NEXT_PUBLIC_API_URL}/poster`;
+const url = `${process.env.NEXT_PUBLIC_API_URL}`;
 
 // fetch all active jobs from the API
 async function getActiveJobs(): Promise<IJobPost[]> {
-    const res = await fetch(url);
+    const res = await fetch(url + `/job`);
 
     if (!res.ok) {
         throw new Error("Failed to fetch data");
@@ -20,7 +20,7 @@ async function getActiveJobs(): Promise<IJobPost[]> {
 }
 // fetch a job by ID from the API
 async function getJobById(id: string): Promise<IJobPost> {
-    const res = await fetch(`${url}?id=${id}`);
+    const res = await fetch(`${url}/job?id=${id}`);
 
     if (!res.ok) {
         throw new Error("Failed to fetch job with the given ID");

@@ -7,7 +7,7 @@ import { addToast, Checkbox, CheckboxGroup, NumberInput, Select, SelectItem } fr
 import { Button } from "@heroui/button";
 
 const Page = () => {
-    const [selectedCategory, setSelectedCategory] = useState<string>("");
+    const [jobCategory, setjobCategory] = useState<string>("");
     const [submitMessage, setSubmitMessage] = useState<string>("");
     const [salaryError, setSalaryError] = useState<string>("");
 
@@ -21,7 +21,14 @@ const Page = () => {
             endRange: 0,
         },
         jobLevel: [] as string[],
+        jobCategory: "",
         skills: [] as string[],
+        jobLocation: {
+            city: "",
+            state: "",
+            country: "",
+        },
+
     });
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -79,13 +86,25 @@ const Page = () => {
     };
 
     const handleCategoryChange = (categoryName: string) => {
-        setSelectedCategory(categoryName);
-        // Reset skills when category changes
+        setjobCategory(categoryName);
+
         setFormData(prev => ({
             ...prev,
-            skills: []
+            jobCategory: categoryName,
+            skills: [],
         }));
     };
+
+    const handleJobLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            jobLocation: {
+                ...prev.jobLocation,
+                [name]: value
+            }
+        }));
+    }
 
     const validateSalaryRange = () => {
         const { startRange, endRange } = formData.salaryRange;
@@ -101,6 +120,7 @@ const Page = () => {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        console.log(formData);
 
         // Validate salary range before submission
         if (!validateSalaryRange()) {
@@ -134,7 +154,13 @@ const Page = () => {
                         endRange: 0,
                     },
                     jobLevel: [] as string[],
+                    jobCategory: "",
                     skills: [] as string[],
+                    jobLocation: {
+                        city: "",
+                        state: "",
+                        country: "",
+                    },
                 });
                 addToast({
                     timeout: 8000,
@@ -144,7 +170,7 @@ const Page = () => {
                     icon: "check",
                     color: "success",
                 })
-                setSelectedCategory("");
+                setjobCategory("");
             } else {
                 setSubmitMessage(data.message || 'Submission failed');
             }
@@ -225,11 +251,12 @@ const Page = () => {
                         {/* categories */}
                         <div className="mb-4">
                             <Select
+                                name="jobCategory"
                                 isRequired
                                 className="w-full"
                                 color="warning"
                                 label="Select Categories"
-                                value={selectedCategory}
+                                value={jobCategory}
                                 onChange={(e) => handleCategoryChange(e.target.value)}
                             >
                                 {categoriesData.map((category) => (
@@ -248,9 +275,9 @@ const Page = () => {
                             <label className="text-sm font-bold mb-2" htmlFor="skills">
                                 Skills
                             </label>
-                            {selectedCategory && (
+                            {jobCategory && (
                                 <div className="mb-4">
-                                    <h3 className="font-bold">{selectedCategory}</h3>
+                                    <h3 className="font-bold">{jobCategory}</h3>
                                     <CheckboxGroup
                                         isRequired
                                         name="skills"
@@ -259,7 +286,7 @@ const Page = () => {
                                         onChange={(values) => handleCheckboxGroupChange("skills", values)}
                                     >
                                         {categoriesData
-                                            .find((cat) => cat.name === selectedCategory)?.skills?.map((skill) => (
+                                            .find((cat) => cat.name === jobCategory)?.skills?.map((skill) => (
                                                 <Checkbox
                                                     key={skill}
                                                     value={skill}
@@ -324,6 +351,41 @@ const Page = () => {
                                     </Checkbox>
                                 ))}
                             </CheckboxGroup>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div>
+                                <label className="text-sm font-medium text-gray-700 mb-1 block">City</label>
+                                <Input
+                                    required
+                                    name="jobLocation.city"
+                                    value={formData.jobLocation.city}
+                                    onChange={handleInputChange}
+                                    placeholder="City"
+                                    className="w-full"
+                                />
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium text-gray-700 mb-1 block">State/Province</label>
+                                <Input
+                                    required
+                                    name="jobLocation.state"
+                                    value={formData.jobLocation.state}
+                                    onChange={handleInputChange}
+                                    placeholder="State/Province"
+                                    className="w-full"
+                                />
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium text-gray-700 mb-1 block">Country</label>
+                                <Input
+                                    required
+                                    name="jobLocation.country"
+                                    value={formData.jobLocation.country}
+                                    onChange={handleInputChange}
+                                    placeholder="Country"
+                                    className="w-full"
+                                />
+                            </div>
                         </div>
                     </section>
                     <div className="text-center pb-4">

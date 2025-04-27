@@ -10,6 +10,7 @@ import moment from 'moment';
 import { HiAcademicCap } from "react-icons/hi2";
 import { FaSackDollar } from 'react-icons/fa6';
 import { MdOutlineAccessTimeFilled } from 'react-icons/md';
+import { useRouter } from 'next/navigation';
 
 
 
@@ -18,6 +19,8 @@ const JobDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const [coverLetter, setCoverLetter] = useState('');
     const [job, setJob] = useState<IJobPost | null>(null);
     const resolvedParams = React.use(params);
+    const router = useRouter();
+    const url = `${process.env.NEXT_PUBLIC_API_URL}`;
 
     useEffect(() => {
         const fetchJob = async () => {
@@ -31,11 +34,13 @@ const JobDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
         fetchJob();
     }, [resolvedParams.id]);
 
-    const handleApply = (e: React.FormEvent<HTMLFormElement>): void => {
-        e.preventDefault();
-        alert('Your application has been submitted!');
+    const handleApply = async () => {
+        console.log("nothing");
+
+        router.push(`/find-work/${resolvedParams.id}/apply`);
+        /* alert('Your application has been submitted!');
         setIsApplying(false);
-        setCoverLetter('');
+        setCoverLetter(''); */
     };
 
     if (!job) {
@@ -67,10 +72,10 @@ const JobDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
                         <div>
                             <Button
                                 color="success"
-                                onPress={() => setIsApplying(true)}
+                                onClick={handleApply}
                                 className="mb-5 text-white px-16"
                             >
-                                Apply Now
+                                Apply Nowsss
                             </Button>
                             <br />
                             <Button color="primary" variant="bordered" className=' px-16'>Saved Job</Button>
@@ -130,7 +135,7 @@ const JobDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
                         </div>
 
                         {/* Application Section */}
-                        {isApplying && (
+                        {/* {isApplying && (
                             <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
                                 <h2 className="text-xl font-bold mb-4">Submit a Proposal</h2>
                                 <form onSubmit={handleApply}>
@@ -148,7 +153,9 @@ const JobDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                         />
                                     </div>
                                     <div className="flex items-center justify-between">
-                                        <Button type="submit" color="primary">
+                                        <Button
+
+                                            type="submit" color="primary">
                                             Submit Proposal
                                         </Button>
                                         <Button
@@ -160,7 +167,7 @@ const JobDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                     </div>
                                 </form>
                             </div>
-                        )}
+                        )} */}
                     </div>
                 </div>
             </div>

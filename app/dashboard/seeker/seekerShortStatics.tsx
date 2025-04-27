@@ -1,0 +1,57 @@
+/* eslint-disable */
+"use client";
+const SeekerShortStatics = () => {
+    return (
+        <div className="w-full px-4">
+            <div className="flex justify-end mb-4">
+                <select
+                    className="border border-gray-300 rounded-lg p-2"
+                    onChange={(e) => {
+                        // Handle filter change here
+                        console.log(e.target.value);
+                    }}
+                >
+                    <option value="7-days">Last 7 Days</option>
+                    <option value="1-month">Last 1 Month</option>
+                    <option value="1-year">Last 1 Year</option>
+                    <option value="lifetime">Lifetime</option>
+                </select>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="bg-white shadow rounded-lg p-6">
+                    <h4 className="text-md font-semibold text-gray-700">Current Applied</h4>
+                    <p className="mt-2 text-3xl font-bold text-lime-600">1</p>
+                    <p className="mt-1 text-sm text-gray-500">Filtered statistics</p>
+                </div>
+                <div className="bg-white shadow rounded-lg p-6">
+                    <h4 className="text-md font-semibold text-gray-700">Total Job Applied</h4>
+                    <p className="mt-2 text-3xl font-bold text-blue-600">12</p>
+                    <p className="mt-1 text-sm text-gray-500">Filtered statistics</p>
+                </div>
+                <div className="bg-white shadow rounded-lg p-6">
+                    <h4 className="text-md font-semibold text-gray-700">Total Hires</h4>
+                    <p className="mt-2 text-3xl font-bold text-green-600">57</p>
+                    <p className="mt-1 text-sm text-gray-500">Filtered statistics</p>
+                </div>
+                <div className="bg-white shadow rounded-lg p-6">
+                    <h4 className="text-md font-semibold text-gray-700">Success Rate</h4>
+                    <p className="mt-2 text-3xl font-bold text-green-600">85%</p>
+                    <p className="mt-1 text-sm text-gray-500">Filtered statistics</p>
+                </div>
+                {/*  <div className="bg-white shadow rounded-lg p-6">
+                    <h4 className="text-md font-semibold text-gray-700">Job Poster Accounts</h4>
+                    <p className="mt-2 text-3xl font-bold text-purple-600">345</p>
+                    <p className="mt-1 text-sm text-gray-500">Filtered statistics</p>
+                </div>
+                <div className="bg-white shadow rounded-lg p-6">
+                    <h4 className="text-md font-semibold text-gray-700">Job Seeker Accounts</h4>
+                    <p className="mt-2 text-3xl font-bold text-red-600">789</p>
+                    <p className="mt-1 text-sm text-gray-500">Filtered statistics</p>
+                </div> */}
+
+            </div>
+        </div>
+    );
+};
+
+export default SeekerShortStatics;
