@@ -6,6 +6,7 @@ import { getActiveJobs } from './jobFetch';
 
 
 const ActiveWorks = async () => {
+    // current active jobs are locate here
     const jobs: IJobPost[] = await getActiveJobs();
     return (
         <div className="space-y-6">
