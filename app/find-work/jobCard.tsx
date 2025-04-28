@@ -5,21 +5,23 @@ import type { IJobPost } from '@/models/jobPost';
 import { FaBriefcase, FaClock, FaHeart } from 'react-icons/fa6';
 import moment from 'moment';
 import { FaTimes } from 'react-icons/fa';
+import { Button } from '@heroui/button';
+import { useRouter } from 'next/navigation';
 
 interface JobCardProps {
     job: IJobPost;
 }
 
 const JobCard = ({ job }: JobCardProps) => {
+    const router = useRouter();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isFavorite, setIsFavorite] = useState(false);
     const modalRef = useRef<HTMLDivElement>(null);
 
-    // Open job details modal
+    // Handle job view modal
     const handleJobView = (jobId: string) => {
         setIsModalOpen(true);
-        document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
-        console.log(`Viewing job with ID: ${jobId}`);
+        document.body.style.overflow = 'hidden';
     };
 
     // Close job details modal
@@ -32,7 +34,7 @@ const JobCard = ({ job }: JobCardProps) => {
     const toggleFavorite = (e: React.MouseEvent) => {
         e.stopPropagation();
         setIsFavorite(!isFavorite);
-        console.log(`Job ${job._id} ${!isFavorite ? 'added to' : 'removed from'} favorites`);
+        // console.log(`Job ${job._id} ${!isFavorite ? 'added to' : 'removed from'} favorites`);
     };
 
     // Close modal when clicking outside
@@ -68,6 +70,10 @@ const JobCard = ({ job }: JobCardProps) => {
             document.removeEventListener('keydown', handleEscKey);
         };
     }, [isModalOpen]);
+
+    const handleApply = () => {
+        router.push(`/find-work/${job._id}/apply`);
+    }
 
     return (
         <>
@@ -107,18 +113,13 @@ const JobCard = ({ job }: JobCardProps) => {
                             Posted {moment(job.createdAt).fromNow()}
                         </span>
                     </div>
-                    <button
-                        onClick={() => handleJobView(job._id)}
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
-                    >
-                        View Details
-                    </button>
+                    <Button onPress={() => handleJobView(job._id)}>View Details</Button>
                 </div>
             </div>
 
             {/* Modal Backdrop */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300 flex items-center justify-end">
+                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 transition-opacity duration-300 flex items-center justify-end">
                     {/* Modal Content */}
                     <div
                         ref={modalRef}
@@ -138,6 +139,7 @@ const JobCard = ({ job }: JobCardProps) => {
                                 >
                                     <FaHeart className={`h-5 w-5 ${isFavorite ? 'text-red-500' : 'text-gray-400'}`} />
                                 </button>
+
                                 <button
                                     onClick={closeModal}
                                     className="p-2 rounded-full hover:bg-gray-100 transition-colors"
@@ -149,7 +151,7 @@ const JobCard = ({ job }: JobCardProps) => {
                         </div>
 
                         {/* Modal Body */}
-                        <div className="overflow-y-auto p-6" style={{ maxHeight: 'calc(100vh - 140px)' }}>
+                        <div className="overflow-y-auto p-6" style={{ maxHeight: 'calc(100vh - 160px)' }}>
                             <div className="mb-6">
                                 <h1 className="text-2xl font-bold mb-3 text-gray-800">{job.jobTitle}</h1>
                                 <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-4">
@@ -184,7 +186,7 @@ const JobCard = ({ job }: JobCardProps) => {
                                     <h3 className="font-semibold mb-2 text-gray-700">Job Level</h3>
                                     <div className="flex flex-wrap gap-2">
                                         {job.jobLevel.map((level, index) => (
-                                            <span key={`${level}-${index}`} className="bg-gray-100 text-gray-700 text-xs font-medium px-2.5 py-1 rounded-full">
+                                            <span key={`${index}`} className="bg-gray-100 text-gray-700 text-xs font-medium px-2.5 py-1 rounded-full">
                                                 {level}
                                             </span>
                                         ))}
@@ -206,9 +208,7 @@ const JobCard = ({ job }: JobCardProps) => {
 
                         {/* Modal Footer */}
                         <div className="border-t border-gray-200 p-4 bg-white">
-                            <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
-                                Apply Now
-                            </button>
+                            <Button onPress={handleApply} className='bg-blue-700 w-full mb-10'>Apply Now</Button>
                         </div>
                     </div>
                 </div>

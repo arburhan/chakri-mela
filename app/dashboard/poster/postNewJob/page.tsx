@@ -3,12 +3,13 @@
 import React, { useState } from "react";
 import { categoriesData, jobTypeData } from "@/public/data";
 import { Input, Textarea } from "@heroui/input";
-import { Checkbox, CheckboxGroup, NumberInput, Select, SelectItem } from "@heroui/react";
+import { addToast, Checkbox, CheckboxGroup, NumberInput, Select, SelectItem } from "@heroui/react";
 import { Button } from "@heroui/button";
 
 const Page = () => {
-    const [selectedCategory, setSelectedCategory] = useState<string>("");
+    const [jobCategory, setjobCategory] = useState<string>("");
     const [submitMessage, setSubmitMessage] = useState<string>("");
+    const [salaryError, setSalaryError] = useState<string>("");
 
     const [formData, setFormData] = useState({
         jobTitle: "",
@@ -20,7 +21,14 @@ const Page = () => {
             endRange: 0,
         },
         jobLevel: [] as string[],
+        jobCategory: "",
         skills: [] as string[],
+        jobLocation: {
+            city: "",
+            state: "",
+            country: "",
+        },
+
     });
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -36,12 +44,24 @@ const Page = () => {
         const parsedValue = isNaN(value) ? 0 : value;
 
         if (name === "startRange" || name === "endRange") {
+            const updatedSalaryRange = {
+                ...formData.salaryRange,
+                [name]: parsedValue
+            };
+
+            // Clear error when user is updating values
+            setSalaryError("");
+
+            // Check if startRange is greater than or equal to endRange
+            if (name === "startRange" && parsedValue >= formData.salaryRange.endRange && formData.salaryRange.endRange > 0) {
+                setSalaryError("Start range must be less than end range");
+            } else if (name === "endRange" && parsedValue <= formData.salaryRange.startRange && parsedValue > 0) {
+                setSalaryError("End range must be greater than start range");
+            }
+
             setFormData(prev => ({
                 ...prev,
-                salaryRange: {
-                    ...prev.salaryRange,
-                    [name]: parsedValue
-                }
+                salaryRange: updatedSalaryRange
             }));
         } else {
             setFormData(prev => ({
@@ -66,19 +86,50 @@ const Page = () => {
     };
 
     const handleCategoryChange = (categoryName: string) => {
-        setSelectedCategory(categoryName);
-        // Reset skills when category changes
+        setjobCategory(categoryName);
+
         setFormData(prev => ({
             ...prev,
-            skills: []
+            jobCategory: categoryName,
+            skills: [],
         }));
+    };
+
+    const handleJobLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            jobLocation: {
+                ...prev.jobLocation,
+                [name]: value
+            }
+        }));
+    }
+
+    const validateSalaryRange = () => {
+        const { startRange, endRange } = formData.salaryRange;
+
+        if (startRange >= endRange) {
+            setSalaryError("Start range must be less than end range");
+            return false;
+        }
+
+        setSalaryError("");
+        return true;
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        console.log(formData);
+
+        // Validate salary range before submission
+        if (!validateSalaryRange()) {
+            setSubmitMessage("Please fix salary range before submitting.");
+            return;
+        }
+
         const url = `${process.env.NEXT_PUBLIC_API_URL}/poster`;
         try {
-
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
@@ -103,8 +154,23 @@ const Page = () => {
                         endRange: 0,
                     },
                     jobLevel: [] as string[],
+                    jobCategory: "",
                     skills: [] as string[],
+                    jobLocation: {
+                        city: "",
+                        state: "",
+                        country: "",
+                    },
                 });
+                addToast({
+                    timeout: 8000,
+                    title: "Success",
+
+                    description: "Successfully posted a new job",
+                    icon: "check",
+                    color: "success",
+                })
+                setjobCategory("");
             } else {
                 setSubmitMessage(data.message || 'Submission failed');
             }
@@ -112,19 +178,23 @@ const Page = () => {
             setSubmitMessage('Error submitting form');
             console.error('Submission error:', error);
         } finally {
-            console.log('successfully submitted');
+            console.log('Form submission attempt complete');
         }
-        console.log("Form submitted:", "success");
     };
 
     return (
-        <section className="py-10 bg-gray-400 text-black">
+        <section className="py-10 bg-gray-500 text-white">
             <div>
                 <h1 className="text-2xl font-bold text-center pt-10 pb-2">Post a New Job</h1>
+                {submitMessage && (
+                    <div className={`text-center p-2 mb-4 ${submitMessage.includes('success') ? 'bg-green-500' : 'bg-red-500'}`}>
+                        {submitMessage}
+                    </div>
+                )}
                 <form onSubmit={handleSubmit}>
                     <section className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
                         <div className="mb-4">
-                            <label className="text-gray-700 text-sm font-bold mb-2" htmlFor="jobTitle">
+                            <label className="text-sm font-bold mb-2" htmlFor="jobTitle">
                                 Job Title
                             </label>
                             <Input
@@ -136,7 +206,7 @@ const Page = () => {
                             />
                         </div>
                         <div className="mb-4">
-                            <label className="text-gray-700 text-sm font-bold mb-2" htmlFor="jobDescription">
+                            <label className="text-sm font-bold mb-2" htmlFor="jobDescription">
                                 Job Description
                             </label>
                             <Textarea
@@ -148,7 +218,7 @@ const Page = () => {
                             />
                         </div>
                         <div className="mb-4">
-                            <label className="text-gray-700 text-sm font-bold mb-2" htmlFor="jobType">
+                            <label className="text-sm font-bold mb-2" htmlFor="jobType">
                                 Job Type
                             </label>
                             <br />
@@ -159,13 +229,13 @@ const Page = () => {
                                 value={formData.jobType}
                                 onChange={(e) => handleSelectChange("jobType", e.target.value)}
                             >
-                                {jobTypeData.map((type) => (
-                                    <SelectItem key={type.name} data-value={type.name}>{type.name}</SelectItem>
+                                {jobTypeData.map((type, index) => (
+                                    <SelectItem key={index} data-value={type.name}>{type.name}</SelectItem>
                                 ))}
                             </Select>
                         </div>
                         <div className="mb-4">
-                            <label className="text-gray-700 text-sm font-bold mb-2" htmlFor="workingHour">
+                            <label className="text-sm font-bold mb-2" htmlFor="workingHour">
                                 Working Hour
                             </label>
                             <NumberInput
@@ -181,16 +251,18 @@ const Page = () => {
                         {/* categories */}
                         <div className="mb-4">
                             <Select
+                                name="jobCategory"
                                 isRequired
                                 className="w-full"
                                 color="warning"
                                 label="Select Categories"
-                                value={selectedCategory}
+                                value={jobCategory}
                                 onChange={(e) => handleCategoryChange(e.target.value)}
                             >
                                 {categoriesData.map((category) => (
                                     <SelectItem
-                                        key={category.name}
+                                        color="warning"
+                                        key={category.id}
                                         data-value={category.name}
                                     >
                                         {category.name}
@@ -200,12 +272,12 @@ const Page = () => {
                         </div>
                         {/* skills */}
                         <div className="mb-4">
-                            <label className="text-gray-700 text-sm font-bold mb-2" htmlFor="skills">
+                            <label className="text-sm font-bold mb-2" htmlFor="skills">
                                 Skills
                             </label>
-                            {selectedCategory && (
+                            {jobCategory && (
                                 <div className="mb-4">
-                                    <h3 className="text-gray-700 font-bold">{selectedCategory}</h3>
+                                    <h3 className="font-bold">{jobCategory}</h3>
                                     <CheckboxGroup
                                         isRequired
                                         name="skills"
@@ -214,8 +286,16 @@ const Page = () => {
                                         onChange={(values) => handleCheckboxGroupChange("skills", values)}
                                     >
                                         {categoriesData
-                                            .find((cat) => cat.name === selectedCategory)?.skills?.map((skill) => (
-                                                <Checkbox key={skill} value={skill}>
+                                            .find((cat) => cat.name === jobCategory)?.skills?.map((skill, index) => (
+                                                <Checkbox
+                                                    key={index}
+                                                    value={skill}
+                                                    color="warning"
+                                                    classNames={{
+                                                        icon: "text-gray-400",
+                                                        wrapper: "group-[.selected]:bg-warning group-[.selected]:text-white"
+                                                    }}
+                                                >
                                                     {skill}
                                                 </Checkbox>
                                             ))}
@@ -224,31 +304,38 @@ const Page = () => {
                             )}
                         </div>
                         <div className="mb-4">
-                            <label className="text-gray-700 text-sm font-bold mb-2" htmlFor="salaryRange">
+                            <label className="text-sm font-bold mb-2" htmlFor="salaryRange">
                                 Salary Range Per Hour
                             </label>
-                            <NumberInput
-                                required
-                                min={2}
-                                max={150}
-                                name="startRange"
-                                className="w-full"
-                                data-value={String(formData.salaryRange.startRange)}
-                                onChange={(value) => handleNumberInputChange("startRange", Number(value))}
-                            />
-                            <span className="text-black pl-5">to</span>
-                            <NumberInput
-                                required
-                                min={2}
-                                max={550}
-                                name="endRange"
-                                className="w-full"
-                                data-value={String(formData.salaryRange.endRange)}
-                                onChange={(value) => handleNumberInputChange("endRange", Number(value))}
-                            />
+                            <div className="flex items-center gap-2">
+                                <NumberInput
+                                    required
+                                    min={2}
+                                    max={150}
+                                    name="startRange"
+                                    className="w-full"
+                                    data-value={String(formData.salaryRange.startRange)}
+                                    onChange={(value) => handleNumberInputChange("startRange", Number(value))}
+                                />
+                                <span className="px-2">to</span>
+                                <NumberInput
+                                    required
+                                    min={2}
+                                    max={550}
+                                    name="endRange"
+                                    className="w-full"
+                                    data-value={String(formData.salaryRange.endRange)}
+                                    onChange={(value) => handleNumberInputChange("endRange", Number(value))}
+                                />
+                            </div>
+                            {salaryError && (
+                                <div className="text-red-400 mt-1 text-sm font-bold">
+                                    {salaryError}
+                                </div>
+                            )}
                         </div>
                         <div className="mb-4">
-                            <label className="text-gray-700 text-sm font-bold mb-2" htmlFor="jobLevel">
+                            <label className="text-sm font-bold mb-2" htmlFor="jobLevel">
                                 Experience Level
                             </label>
                             <CheckboxGroup
@@ -258,16 +345,57 @@ const Page = () => {
                                 value={formData.jobLevel}
                                 onChange={(values) => handleCheckboxGroupChange("jobLevel", values)}
                             >
-                                {['Entry Level', 'Intermediate', 'Expert'].map((level) => (
-                                    <Checkbox key={level} value={level} className="text-white">
+                                {['Entry Level', 'Intermediate', 'Expert'].map((level, index) => (
+                                    <Checkbox key={index} value={level} className="text-white">
                                         {level}
                                     </Checkbox>
                                 ))}
                             </CheckboxGroup>
                         </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div>
+                                <label className="text-sm font-medium  mb-1 block">City</label>
+                                <Input
+                                    required
+                                    name="jobLocation.city"
+                                    value={formData.jobLocation.city}
+                                    onChange={handleInputChange}
+                                    placeholder="City"
+                                    className="w-full"
+                                />
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium  mb-1 block">State/Province</label>
+                                <Input
+                                    required
+                                    name="jobLocation.state"
+                                    value={formData.jobLocation.state}
+                                    onChange={handleInputChange}
+                                    placeholder="State/Province"
+                                    className="w-full"
+                                />
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium  mb-1 block">Country</label>
+                                <Input
+                                    required
+                                    name="jobLocation.country"
+                                    value={formData.jobLocation.country}
+                                    onChange={handleInputChange}
+                                    placeholder="Country"
+                                    className="w-full"
+                                />
+                            </div>
+                        </div>
                     </section>
                     <div className="text-center pb-4">
-                        <Button type="submit" size="lg">Post Job</Button>
+                        <Button
+                            type="submit"
+                            size="lg"
+                            disabled={!!salaryError}
+                        >
+                            Post Job
+                        </Button>
                     </div>
                 </form>
             </div>

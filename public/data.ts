@@ -140,3 +140,9 @@ export const categoriesData = [
     { id: 10, name: "Medicine Shop", count: "867", icon: "💊", skills: ["Medication Dispensing", "Health Consultation", "Inventory Control", "Patient Care", "Drug Information"] },
     { id: 11, name: "Clothing Store", count: "2,156", icon: "👗", skills: ["Fashion Styling", "Visual Merchandising", "Sales Management", "Stock Management", "Customer Relations"] }
 ];
+
+export const genders = [
+    { key: "male", label: "Male" },
+    { key: "female", label: "Female" },
+    { key: "hijra", label: "Hijra" },
+]

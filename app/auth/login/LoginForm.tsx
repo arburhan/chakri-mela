@@ -31,7 +31,7 @@ const LoginForm = () => {
         setMessage(null);
 
         try {
-            console.log("Login attempt for:", formData.email);
+            // console.log("Login attempt for:", formData.email);
 
             const res = await signIn("credentials", {
                 redirect: false,

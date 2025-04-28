@@ -1,4 +1,4 @@
-
+/* eslint-disable */
 import mongoose, { Mongoose } from 'mongoose';
 
 interface CachedConnection {

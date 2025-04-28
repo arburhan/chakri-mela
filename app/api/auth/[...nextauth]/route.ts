@@ -52,12 +52,12 @@ const authOptions: NextAuthOptions = {
                     console.log("User lookup result:", user ? "User found" : "User not found");
 
                     if (!user) {
-                        throw new Error("No user found with this email");
+                        throw new Error("Invalid email or password");
                     }
 
                     // Check if the password matches
                     const isMatch = await user.matchPassword(credentials.password);
-                    console.log("Password match:", isMatch);
+                    // console.log("Password match:", isMatch);
 
                     if (!isMatch) {
                         throw new Error("Invalid password");
