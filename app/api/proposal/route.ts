@@ -86,6 +86,7 @@ export async function POST(req: NextRequest) {
 }
 
 // GET - Check if user has already applied and get the proposal
+// GET - Get all proposals for a specific job
 export async function GET(req: NextRequest) {
     try {
         const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
@@ -101,6 +102,7 @@ export async function GET(req: NextRequest) {
 
         const url = new URL(req.url);
         const jobID = url.searchParams.get("jobID");
+        const checkApplied = url.searchParams.get("checkApplied");
 
         if (!jobID) {
             return NextResponse.json(
@@ -111,34 +113,68 @@ export async function GET(req: NextRequest) {
 
         const seekerID = token.id;
 
-        // Find existing proposal
-        const existingProposal = await ProposalSchm.findOne({
-            jobID,
-            seekerID
-        });
+        // If only checking if user has applied
+        if (checkApplied === "true") {
+            // Find existing proposal
+            const existingProposal = await ProposalSchm.findOne({
+                jobID,
+                seekerID
+            });
 
-        if (!existingProposal) {
+            if (!existingProposal) {
+                return NextResponse.json(
+                    { hasApplied: false },
+                    { status: 200 }
+                );
+            }
+
             return NextResponse.json(
-                { hasApplied: false },
+                {
+                    hasApplied: true,
+                    proposal: existingProposal
+                },
                 { status: 200 }
             );
         }
 
+        // Check if the user is the job owner
+        const jobPost = await JobPost.findById(jobID);
+        if (!jobPost) {
+            return NextResponse.json(
+                { error: "Job not found" },
+                { status: 404 }
+            );
+        }
+
+        // Verify ownership - ensure this user is the job creator
+        /*    if (jobPost.employerID.toString() !== seekerID) {
+               return NextResponse.json(
+                   { error: "Unauthorized to view these proposals" },
+                   { status: 403 }
+               );
+           } */
+
+        // Get all proposals for this job
+        const proposals = await ProposalSchm.find({ jobID })
+            .populate({
+                path: 'seekerID',
+                select: 'name profilePicture' // Only select necessary fields
+            });
+
         return NextResponse.json(
-            {
-                hasApplied: true,
-                proposal: existingProposal
-            },
+            { proposals },
             { status: 200 }
         );
     } catch (error) {
-        console.error("Error checking proposal status:", error);
+        console.error("Error fetching proposals:", error);
         return NextResponse.json(
             { error: "Server Error" },
             { status: 500 }
         );
     }
 }
+
+
 
 // PUT - Update existing proposal
 export async function PUT(req: NextRequest) {

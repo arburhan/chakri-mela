@@ -14,8 +14,8 @@ import { FaCalendarAlt, FaMobile } from 'react-icons/fa';
 import { FaLocationDot } from 'react-icons/fa6';
 import { getSession } from 'next-auth/react';
 import { getSingleUser } from '../../fetchUser';
-import { categoriesData, genders } from '@/public/data';
-import LoadingComponent from '@/components/shared/loading';
+import { genders } from '@/public/data';
+import Loading from '@/app/find-work/loading';
 
 const url = `${process.env.NEXT_PUBLIC_API_URL}`;
 
@@ -32,11 +32,9 @@ interface FormState {
     };
     dateOfBirth: string;
     nidNumber: string;
-    categories: string[];
-    skills: string[];
 }
 
-const JobSeekerProfile = () => {
+const JobPosterProfile = () => {
     const [user, setUser] = useState<IUser | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -55,12 +53,7 @@ const JobSeekerProfile = () => {
         },
         dateOfBirth: '',
         nidNumber: '',
-        categories: [],
-        skills: [],
     });
-
-    const [selectedCategory, setSelectedCategory] = useState('');
-    const [availableSkills, setAvailableSkills] = useState<string[]>([]);
 
     useEffect(() => {
         const fetchUserProfile = async () => {
@@ -84,8 +77,6 @@ const JobSeekerProfile = () => {
                     },
                     dateOfBirth: userData.dateOfBirth ? moment(userData.dateOfBirth).format('YYYY-MM-DD') : '',
                     nidNumber: userData.nidNumber ? String(userData.nidNumber) : '',
-                    categories: userData.categories || [],
-                    skills: userData.skills || [],
                 });
             } catch (err: any) {
                 console.error('Error fetching user profile:', err);
@@ -128,69 +119,8 @@ const JobSeekerProfile = () => {
     };
 
 
-    const handleCategorySelect = (value: string) => {
-        setSelectedCategory(value);
-        // Find skills for the selected category
-        const categorySkills = categoriesData.find(cat => cat.name === value)?.skills || [];
-        setAvailableSkills(categorySkills);
-    };
-
-    const addCategory = () => {
-        if (selectedCategory && !formData.categories.includes(selectedCategory)) {
-            setFormData({
-                ...formData,
-                categories: [...formData.categories, selectedCategory],
-            });
-            setSelectedCategory('');
-        }
-    };
-
-    const removeCategory = (categoryToRemove: string) => {
-        // Remove the category
-        setFormData({
-            ...formData,
-            categories: formData.categories.filter(category => category !== categoryToRemove),
-            // Also remove skills that belong to this category
-            skills: formData.skills.filter(skill => {
-                const categorySkills = categoriesData.find(cat => cat.name === categoryToRemove)?.skills || [];
-                return !categorySkills.includes(skill);
-            })
-        });
-    };
-
-
-    const validateForm = () => {
-        // Check if at least one category is selected
-        if (formData.categories.length === 0) {
-            alert("Please select at least one job category.");
-            return false;
-        }
-
-        // Check if each category has at least one skill selected
-        for (const category of formData.categories) {
-            const categorySkills = categoriesData.find(cat => cat.name === category)?.skills || [];
-            const selectedSkillsForCategory = formData.skills.filter(skill =>
-                categorySkills.includes(skill)
-            );
-
-            if (selectedSkillsForCategory.length === 0) {
-                alert(`Please select at least one skill for the "${category}" category.`);
-                return false;
-            }
-        }
-
-        return true;
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
-        // Validate the form before submission
-        if (!validateForm()) {
-            console.log("error in form validation");
-            return;
-        }
-
 
         const session = await getSession();
         const userEmail = session?.user?.email;
@@ -224,7 +154,7 @@ const JobSeekerProfile = () => {
 
     if (loading && !user) {
         return (
-            <LoadingComponent />
+            <Loading />
         );
     }
 
@@ -250,13 +180,6 @@ const JobSeekerProfile = () => {
             .join('')
             .toUpperCase();
     };
-
-
-
-    // Get categories that haven't been selected yet
-    const availableCategories = categoriesData.filter(
-        category => !formData.categories.includes(category.name)
-    );
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -409,110 +332,6 @@ const JobSeekerProfile = () => {
 
                             <Divider className="my-6" />
 
-                            <h2 className="text-xl font-semibold mb-4">Job Categories</h2>
-                            <div className="mb-6">
-                                {formData.categories.length > 0 && (
-                                    <div className="flex flex-wrap gap-2 mb-3">
-                                        {formData.categories.map((category, index) => (
-                                            <Badge key={index} className="flex items-center gap-1 px-3 py-1">
-                                                {category}
-                                                <button type="button" onClick={() => removeCategory(category)} className="ml-1">
-                                                    <MdCancel size={14} />
-                                                </button>
-                                            </Badge>
-                                        ))}
-                                    </div>
-                                )}
-
-                                {availableCategories.length > 0 && (
-                                    <div className="flex gap-2 mt-3">
-                                        <Select
-                                            className="w-full"
-                                            color="warning"
-                                            label="Select a Category"
-                                            selectedKeys={selectedCategory ? [selectedCategory] : []}
-                                            onSelectionChange={(keys) => handleCategorySelect(Array.from(keys)[0] as string)}
-                                            items={availableCategories}
-                                        >
-                                            {(category) => <SelectItem key={category.name}>{category.name}</SelectItem>}
-                                        </Select>
-                                        <Button
-                                            type="button"
-                                            onPress={addCategory}
-                                            size="sm"
-                                            disabled={!selectedCategory}
-                                        >
-                                            Add
-                                        </Button>
-                                    </div>
-                                )}
-
-                                {availableCategories.length === 0 && (
-                                    <p className="text-gray-500 text-sm mt-2">All categories have been added.</p>
-                                )}
-                            </div>
-
-                            <Divider className="my-6" />
-
-                            {/* Now let's add the skills section for each selected category */}
-                            <h2 className="text-xl font-semibold mb-4">Skills by Category</h2>
-                            <div className="mb-6">
-                                {formData.categories.length > 0 ? (
-                                    formData.categories.map((category) => {
-                                        const categorySkills = categoriesData.find(cat => cat.name === category)?.skills || [];
-                                        const selectedSkillsForCategory = formData.skills.filter(skill =>
-                                            categorySkills.includes(skill)
-                                        );
-
-                                        return (
-                                            <div key={category} className="mb-6 p-4 border border-gray-200 rounded-lg">
-                                                <h3 className="font-medium mb-2">{category} Skills</h3>
-                                                <p className="text-sm text-gray-500 mb-3">Please select at least one skill for this category.</p>
-
-                                                <CheckboxGroup
-                                                    className="grid grid-cols-1 md:grid-cols-2 gap-2"
-                                                    value={selectedSkillsForCategory}
-                                                    onChange={(selectedValues) => {
-                                                        // Keep skills from other categories
-                                                        const otherCategorySkills = formData.skills.filter(skill =>
-                                                            !categorySkills.includes(skill)
-                                                        );
-
-                                                        // Add selected skills from this category
-                                                        setFormData({
-                                                            ...formData,
-                                                            skills: [...otherCategorySkills, ...selectedValues]
-                                                        });
-                                                    }}
-                                                >
-                                                    {categorySkills.map((skill, index) => (
-                                                        <Checkbox
-                                                            key={index}
-                                                            value={skill}
-                                                            color="warning"
-                                                            isSelected={formData.skills.includes(skill)}
-                                                            classNames={{
-                                                                icon: "text-gray-400",
-                                                                wrapper: "group-[.selected]:bg-warning group-[.selected]:text-white"
-                                                            }}
-                                                        >
-                                                            {skill}
-                                                        </Checkbox>
-                                                    ))}
-                                                </CheckboxGroup>
-
-                                                {selectedSkillsForCategory.length === 0 && (
-                                                    <p className="text-red-500 text-sm mt-2">
-                                                        Please select at least one skill for this category.
-                                                    </p>
-                                                )}
-                                            </div>
-                                        );
-                                    })
-                                ) : (
-                                    <p className="text-gray-500">Please select at least one job category first.</p>
-                                )}
-                            </div>
                         </Card>
                     </div>
 
@@ -596,34 +415,6 @@ const JobSeekerProfile = () => {
                         )}
 
                         <Divider className="my-6" />
-
-                        <h2 className="text-xl font-semibold mb-4">Job Categories</h2>
-                        {user?.categories && user.categories.length > 0 ? (
-                            <div className="flex flex-wrap gap-2 mb-6">
-                                {user.categories.map((category, index) => (
-                                    <Badge key={index} className="px-3 py-1">
-                                        {category}
-                                    </Badge>
-                                ))}
-                            </div>
-                        ) : (
-                            <p className="text-gray-500 mb-6">No job categories added</p>
-                        )}
-
-                        <Divider className="my-6" />
-
-                        <h2 className="text-xl font-semibold mb-4">Skills</h2>
-                        {user?.skills && user.skills.length > 0 ? (
-                            <div className="flex flex-wrap gap-2">
-                                {user.skills.map((skill, index) => (
-                                    <Badge key={index} className="px-3 py-1">
-                                        {skill}
-                                    </Badge>
-                                ))}
-                            </div>
-                        ) : (
-                            <p className="text-gray-500">No skills added</p>
-                        )}
                     </Card>
                 </div>
             )}
@@ -631,4 +422,4 @@ const JobSeekerProfile = () => {
     );
 };
 
-export default JobSeekerProfile;
+export default JobPosterProfile;

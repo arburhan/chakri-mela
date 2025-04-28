@@ -2,7 +2,6 @@
 'use client';
 import React, { Suspense, useState, useEffect } from 'react';
 import { Button } from '@heroui/button';
-import { Textarea } from '@heroui/input';
 import { getJobById } from '../jobFetch';
 import { IJobPost } from '@/models/jobPost';
 import { BreadcrumbItem, Breadcrumbs } from '@heroui/react';
@@ -10,7 +9,7 @@ import moment from 'moment';
 import { HiAcademicCap } from "react-icons/hi2";
 import { FaSackDollar } from 'react-icons/fa6';
 import { MdOutlineAccessTimeFilled } from 'react-icons/md';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import JobDetailsLoading from '@/components/JobDetailsLoading';
 
 
@@ -29,7 +28,7 @@ const JobHeader = ({ job, handleApply }: { job: IJobPost, handleApply: () => voi
             <div>
                 <Button
                     color="success"
-                    onClick={handleApply}
+                    onPress={handleApply}
                     className="mb-5 text-white px-16"
                 >
                     Apply Now
@@ -102,29 +101,31 @@ const JobContent = ({ job }: { job: IJobPost }) => (
 );
 
 // Main component with streaming
-const JobDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
-    const [job, setJob] = useState<IJobPost | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const resolvedParams = React.use(params);
+const JobDetailsPage = () => {
+    const params = useParams<{ id: string }>();
+    const jobId = params.id;
     const router = useRouter();
+    const [isLoading, setIsLoading] = useState(true);
+    const [job, setJob] = useState<IJobPost | null>(null);
+    // Get job ID from URL
 
     useEffect(() => {
         const fetchJob = async () => {
-            setIsLoading(true);
             try {
-                const jobData = await getJobById(resolvedParams.id);
-                setJob(jobData);
+                // Simulate loading state
+                const singleJob = await getJobById(jobId);
+                setJob(singleJob);
+                setIsLoading(false); // Add this line to turn off the loading state
             } catch (error) {
-                console.error('Error fetching job:', error);
-            } finally {
-                setIsLoading(false);
+                console.error("Error fetching job:", error);
+                setIsLoading(false); // Also turn off loading in case of error
             }
         };
         fetchJob();
-    }, [resolvedParams.id]);
+    }, [jobId]);
 
     const handleApply = async () => {
-        router.push(`/find-work/${resolvedParams.id}/apply`);
+        router.push(`/find-work/${jobId}/apply`);
     };
 
     if (isLoading) {
@@ -141,7 +142,7 @@ const JobDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
                         <Button
                             color="primary"
                             className="mt-4"
-                            onClick={() => router.push('/find-work')}
+                            onPress={() => router.push('/find-work')}
                         >
                             Browse Jobs
                         </Button>

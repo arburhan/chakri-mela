@@ -1,102 +1,116 @@
 /* eslint-disable */
-import { getActiveJobs } from '@/app/find-work/jobFetch';
+'use client';
+import React, { useEffect, useState } from 'react';
 import { IJobPost } from '@/models/jobPost';
 import { Button } from '@heroui/button';
-import React from 'react';
-
-/* const url = `${process.env.NEXT_PUBLIC_API_URL}/poster`;
- */
-
-const Page = async () => {
-    const activeJobs: IJobPost[] = await getActiveJobs();
+import { getActiveJobs } from '@/app/find-work/jobFetch';
+import ProposalTracker from './proposalTracker';
+import { useRouter } from 'next/navigation';
+import Loading from '@/app/find-work/loading';
 
 
-    if (!activeJobs) {
+const JobsPage = () => {
+    const [activeJobs, setActiveJobs] = useState<IJobPost[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchJobs = async () => {
+            try {
+                const jobs = await getActiveJobs();
+                setActiveJobs(jobs || []);
+            } catch (error) {
+                console.error('Error fetching jobs:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchJobs();
+    }, []);
+
+    if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="text-xl font-semibold text-gray-600">
-                    No active job found
+            <Loading />
+        );
+    }
+
+    if (!activeJobs || activeJobs.length === 0) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-8">
+                <div className="text-2xl font-semibold text-gray-600 mb-4">
+                    No active jobs found
                 </div>
+                <Button color="primary" size="lg">
+                    Post a New Job
+                </Button>
             </div>
         );
     }
-    const handleComplete = async () => {
-        /* const res = await fetch(`${url}/${activeJob._id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ status: 'completed' }),
-        });
-        if (!res.ok) {
-            console.log('Failed to update job status')
-        }
-        const updatedJob = await res.json();
-        console.log('Job status updated:', updatedJob); */
-    }
-    const handleDelete = async () => {
-        /* const res = await fetch(`${url}/${activeJob._id}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-        if (!res.ok) {
-            console.log('Failed to delete job')
-        }
-        const deletedJob = await res.json();
-        console.log('Job deleted:', deletedJob); */
-    }
-    const handleEdit = async () => {
-        /* const res = await fetch(`${url}/${activeJob._id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ status: 'edited' }),
-        });
-        if (!res.ok) {
-            console.log('Failed to edit job')
-        }
-        const editedJob = await res.json();
-        console.log('Job edited:', editedJob); */
-    }
-
 
     return (
-        <section className="py-16 bg-gray-200 text-black">
-            <div className="container mx-auto px-4">
-                <h2 className="text-3xl font-bold mb-8">Active Jobs</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {
-                        activeJobs.map((job) => (
-                            <div key={job._id} className=" bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                                <div className="flex items-start justify-between mb-4">
-                                    <h3 className="font-semibold mb-2">{job?.jobTitle}</h3>
-                                    <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
-                                        ${job?.salaryRange.startRange}/hr
-                                        ${job.salaryRange.endRange}/hr
-                                    </span>
-                                </div>
-
-                                <p className="text-gray-600 text-sm mb-2">
-                                    Type: {job?.jobType}
-                                </p>
-                                <div className='text-center py-3'>
-                                    <div className='flex flex-wrap justify-between pb-6'>
-                                        <Button>Edit</Button>
-                                        <Button>Delete</Button>
-                                    </div>
-                                    <Button >Make Complete</Button>
-                                </div>
+        <div className="min-h-screen bg-gray-50">
+            <div className="container mx-auto px-4 py-8">
+                <div className="flex flex-col lg:flex-row gap-8">
+                    <div className="lg:w-2/3">
+                        <div className="flex justify-between items-center mb-8">
+                            <h1 className="text-3xl font-bold text-gray-800">Your Active Jobs</h1>
+                            <div className="text-sm text-gray-500">
+                                {activeJobs.length} {activeJobs.length === 1 ? 'job' : 'jobs'} active
                             </div>
-                        ))
-                    }
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {activeJobs.map((job) => (
+                                <JobCard key={job._id} job={job} />
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="lg:w-1/3">
+                        <ProposalTracker jobs={activeJobs} />
+                    </div>
                 </div>
             </div>
-        </section >
-
+        </div>
     );
 };
 
-export default Page;
+const JobCard = (({ job }: { job: IJobPost }) => {
+    const router = useRouter();
+    const handleShowProposals = (jobID: string) => {
+        console.log('Show proposals for job:', jobID);
+        // router.push(`/dashboard/poster/currentJob/${jobID}`);
+    }
+    return (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all">
+            <div className="p-6">
+                <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-xl font-semibold text-gray-800">{job.jobTitle}</h3>
+                    <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
+                        {job.jobType}
+                    </span>
+                </div>
+
+                <div className="flex items-center mb-4">
+                    <span className="text-gray-600 mr-2">Rate:</span>
+                    <span className="font-medium text-green-900">
+                        ${job.salaryRange.startRange} - ${job.salaryRange.endRange}/hr
+                    </span>
+                </div>
+
+                <div className="flex items-center mb-6">
+                    <span className="text-gray-600 mr-2">Proposals:</span>
+                    <span className="font-medium text-blue-700">12</span>
+                </div>
+
+                <div className="flex flex-col space-y-3">
+                    <Button onPress={() => handleShowProposals(job?._id)} color="secondary" size="sm" className="w-full mt-6">
+                        View Proposals
+                    </Button>
+                </div>
+            </div>
+        </div>
+    );
+});
+
+export default JobsPage;

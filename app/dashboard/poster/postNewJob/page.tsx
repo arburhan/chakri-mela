@@ -354,7 +354,7 @@ const Page = () => {
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                             <div>
-                                <label className="text-sm font-medium text-gray-700 mb-1 block">City</label>
+                                <label className="text-sm font-medium  mb-1 block">City</label>
                                 <Input
                                     required
                                     name="jobLocation.city"
@@ -365,7 +365,7 @@ const Page = () => {
                                 />
                             </div>
                             <div>
-                                <label className="text-sm font-medium text-gray-700 mb-1 block">State/Province</label>
+                                <label className="text-sm font-medium  mb-1 block">State/Province</label>
                                 <Input
                                     required
                                     name="jobLocation.state"
@@ -376,7 +376,7 @@ const Page = () => {
                                 />
                             </div>
                             <div>
-                                <label className="text-sm font-medium text-gray-700 mb-1 block">Country</label>
+                                <label className="text-sm font-medium  mb-1 block">Country</label>
                                 <Input
                                     required
                                     name="jobLocation.country"
