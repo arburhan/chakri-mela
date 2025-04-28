@@ -10,6 +10,7 @@ const Page = () => {
     const [jobCategory, setjobCategory] = useState<string>("");
     const [submitMessage, setSubmitMessage] = useState<string>("");
     const [salaryError, setSalaryError] = useState<string>("");
+    console.log(jobCategory);
 
     const [formData, setFormData] = useState({
         jobTitle: "",
@@ -33,10 +34,27 @@ const Page = () => {
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+
+        // Check if this is a nested property (contains a dot)
+        if (name.includes('.')) {
+            const [parent, child] = name.split('.');
+
+            if (parent === 'jobLocation') {
+                setFormData(prev => ({
+                    ...prev,
+                    jobLocation: {
+                        ...prev.jobLocation,
+                        [child]: value
+                    }
+                }));
+            }
+            // Add other nested objects if needed in the future
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                [name]: value
+            }));
+        }
     };
 
     const handleNumberInputChange = (name: string, value: number) => {
@@ -86,12 +104,13 @@ const Page = () => {
     };
 
     const handleCategoryChange = (categoryName: string) => {
+        console.log("Selected category:", categoryName); // Add this for debugging
         setjobCategory(categoryName);
 
         setFormData(prev => ({
             ...prev,
             jobCategory: categoryName,
-            skills: [],
+            skills: [], // Reset skills when category changes
         }));
     };
 
@@ -256,13 +275,13 @@ const Page = () => {
                                 className="w-full"
                                 color="warning"
                                 label="Select Categories"
-                                value={jobCategory}
+                                data-value={jobCategory}
                                 onChange={(e) => handleCategoryChange(e.target.value)}
                             >
                                 {categoriesData.map((category) => (
                                     <SelectItem
                                         color="warning"
-                                        key={category.id}
+                                        key={category.name}
                                         data-value={category.name}
                                     >
                                         {category.name}
@@ -357,9 +376,9 @@ const Page = () => {
                                 <label className="text-sm font-medium  mb-1 block">City</label>
                                 <Input
                                     required
-                                    name="jobLocation.city"
+                                    name="city"  // Change to just "city"
                                     value={formData.jobLocation.city}
-                                    onChange={handleInputChange}
+                                    onChange={(e) => handleJobLocationChange(e)}
                                     placeholder="City"
                                     className="w-full"
                                 />
