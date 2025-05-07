@@ -9,12 +9,12 @@ import moment from 'moment';
 import { HiAcademicCap } from "react-icons/hi2";
 import { FaSackDollar } from 'react-icons/fa6';
 import { MdOutlineAccessTimeFilled } from 'react-icons/md';
-import { useParams, useRouter } from 'next/navigation';
+import { redirect, useParams, useRouter } from 'next/navigation';
 import JobDetailsLoading from '@/components/JobDetailsLoading';
+import { useSession } from 'next-auth/react';
+import Link from 'next/link';
 
-
-// Separate component for job header
-const JobHeader = ({ job, handleApply }: { job: IJobPost, handleApply: () => void }) => (
+const JobHeader = ({ job, handleApply, session }: { job: IJobPost, handleApply: () => void, session: any }) => (
     <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
         <div className="flex justify-between items-start mb-4">
             <div>
@@ -22,17 +22,28 @@ const JobHeader = ({ job, handleApply }: { job: IJobPost, handleApply: () => voi
                 <div className="flex flex-wrap gap-2 text-sm text-gray-600 mb-4">
                     <span>{job.jobType}</span>
                     <span>•</span>
-                    <span>Posted {moment(job.createdAt).format("MMMM Do YYYY")}</span>
+                    <span>Posted: {moment(job.createdAt).format("MMMM Do YYYY")}</span>
                 </div>
             </div>
             <div>
-                <Button
-                    color="success"
-                    onPress={handleApply}
-                    className="mb-5 text-white px-16"
-                >
-                    Apply Now
-                </Button>
+                {
+                    session ? (session?.user?.role === 'seeker' &&
+                        <Button
+                            color="success"
+                            onPress={handleApply}
+                            className="mb-5 text-white px-16"
+                        >
+                            Apply Now
+                        </Button>) :
+                        <Button
+                            onPress={() => redirect('/auth/login')}
+                            className="mb-5 text-white px-12"
+                        >
+                            Login to Apply
+                        </Button>
+
+
+                }
                 <br />
                 <Button color="primary" variant="bordered" className="px-16">
                     Save Job
@@ -64,7 +75,7 @@ const JobHeader = ({ job, handleApply }: { job: IJobPost, handleApply: () => voi
                 <MdOutlineAccessTimeFilled className="w-8 h-8" />
                 <div>
                     <div className="font-medium mb-1">Working Hours</div>
-                    <div className="text-xl font-bold text-gray-900">{job.workingHour} hrs/week</div>
+                    <div className="text-xl font-bold text-gray-900">{job.workingHour} hrs/day</div>
                 </div>
             </div>
         </div>
@@ -102,6 +113,7 @@ const JobContent = ({ job }: { job: IJobPost }) => (
 
 // Main component with streaming
 const JobDetailsPage = () => {
+    const { data: session } = useSession();
     const params = useParams<{ id: string }>();
     const jobId = params.id;
     const router = useRouter();
@@ -164,7 +176,7 @@ const JobDetailsPage = () => {
 
                 {/* Job Header */}
                 <Suspense fallback={<div className="animate-pulse bg-white rounded-lg shadow-sm p-6 mb-6 h-48"></div>}>
-                    <JobHeader job={job} handleApply={handleApply} />
+                    <JobHeader job={job} handleApply={handleApply} session={session} />
                 </Suspense>
 
                 {/* Main Content */}
