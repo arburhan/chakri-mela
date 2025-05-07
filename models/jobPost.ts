@@ -7,6 +7,16 @@ interface ISalaryRange {
     endRange: number;
 }
 
+// Interface for proposal
+interface IProposal {
+    _id: mongoose.Types.ObjectId;
+    coverLetter: string;
+    bidAmount: number;
+    jobID: mongoose.Types.ObjectId;
+    seekerID: mongoose.Types.ObjectId;
+    status: string;
+}
+
 // Interface for job post document
 export interface IJobPost extends Document {
     _id: string;
@@ -24,6 +34,7 @@ export interface IJobPost extends Document {
         state: string;
         country: string;
     };
+    proposals: IProposal[];
     posterID: mongoose.Schema.Types.ObjectId;
     createdAt: Date;
     updatedAt: Date;
@@ -33,76 +44,112 @@ export interface IJobPost extends Document {
 const JobPostSchema: Schema = new Schema({
     jobTitle: {
         type: String,
-        required: true
+        required: true,
     },
     jobDescription: {
         type: String,
-        required: true
+        required: true,
     },
     jobType: {
         type: String,
-        required: true
+        required: true,
     },
     workingHour: {
         type: Number,
-        required: true
+        required: true,
     },
     salaryRange: {
         startRange: {
             type: Number,
-            required: true
+            required: true,
         },
         endRange: {
             type: Number,
-            required: true
-        }
+            required: true,
+        },
     },
-    jobLevel: [{
-        type: String,
-        required: true
-    }],
+    jobLevel: [
+        {
+            type: String,
+            required: true,
+        },
+    ],
     jobCategory: {
         type: String,
-        required: true
+        required: true,
     },
-    skills: [{
-        type: String,
-        required: true
-    }],
+    skills: [
+        {
+            type: String,
+            required: true,
+        },
+    ],
     status: {
         type: String,
-        enum: ['active', 'completed', 'expired'],
-        default: 'active',
-        required: true
+        enum: ["active", "completed", "expired"],
+        default: "active",
+        required: true,
     },
     jobLocation: {
         city: {
             type: String,
-            required: true
+            required: true,
         },
         state: {
             type: String,
-            required: true
+            required: true,
         },
         country: {
             type: String,
-            required: true
-        }
+            required: true,
+        },
     },
+    proposals: [
+        {
+            _id: {
+                type: mongoose.Schema.Types.ObjectId,
+                default: () => new mongoose.Types.ObjectId(), // Automatically generate unique ID
+            },
+            coverLetter: {
+                type: String,
+                required: true,
+            },
+            bidAmount: {
+                type: Number,
+                required: true,
+            },
+            jobID: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "JobPost",
+                required: true,
+            },
+            seekerID: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+                required: true,
+            },
+            status: {
+                type: String,
+                enum: ["pending", "accepted", "rejected"],
+                default: "pending",
+                required: true,
+            },
+        },
+    ],
     posterID: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+        ref: "User",
+        required: true,
     },
 }, {
-    timestamps: true
+    timestamps: true,
 });
 
-JobPostSchema.pre('save', function (next) {
+JobPostSchema.pre("save", function (next) {
     // Perform any pre-save operations here if needed
     next();
 });
 
-const IJobPost = (mongoose.models.JobPost as Model<IJobPost>) || mongoose.model<IJobPost>("JobPost", JobPostSchema);
+const JobPost = (mongoose.models.JobPost as Model<IJobPost>) || mongoose.model<IJobPost>("JobPost", JobPostSchema);
 
-export default IJobPost;
+export default JobPost;

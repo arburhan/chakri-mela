@@ -1,6 +1,5 @@
 import "@/styles/globals.css";
 import { Metadata, Viewport } from "next";
-import { Link } from "@heroui/link";
 import clsx from "clsx";
 
 import { Providers } from "./providers";
@@ -9,7 +8,6 @@ import { siteConfig } from "@/config/site";
 import { fontSans } from "@/config/fonts";
 import Navbar from "@/components/Navbar/navbar";
 import { Footer } from "@/components/footer";
-
 
 export const metadata: Metadata = {
   title: {
@@ -43,12 +41,10 @@ export default function RootLayout({
           fontSans.variable,
         )}
       >
-        <Providers >
-          <div >
+        <Providers>
+          <div>
             <Navbar />
-            <main>
-              {children}
-            </main>
+            <main>{children}</main>
             <Footer />
           </div>
         </Providers>
