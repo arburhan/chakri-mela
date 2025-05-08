@@ -3,11 +3,12 @@
 import React, { useEffect, useState } from 'react';
 import { IJobPost } from '@/models/jobPost';
 import { Button } from '@heroui/button';
-import { getActiveJobsByUser } from '@/app/find-work/jobFetch';
 import ProposalTracker from './proposalTracker';
 import { useRouter } from 'next/navigation';
 import Loading from '@/app/find-work/loading';
 import { useSession } from 'next-auth/react';
+import { getActiveJobsByPoster } from '@/app/find-work/jobFetch';
+
 
 
 const JobsPage = () => {
@@ -19,7 +20,7 @@ const JobsPage = () => {
     useEffect(() => {
         const fetchJobs = async () => {
             try {
-                const jobs = await getActiveJobsByUser(userId as string);
+                const jobs = await getActiveJobsByPoster(userId as string);
                 setActiveJobs(jobs || []);
             } catch (error) {
                 console.error('Error fetching jobs:', error);
