@@ -3,27 +3,6 @@ import { IProposal } from "@/models/proposal";
 
 const url = `${process.env.NEXT_PUBLIC_API_URL}`;
 
-// Fetch all proposals for a specific job
-async function getProposalByID(jobID: string): Promise<IProposal[]> {
-    try {
-        const res = await fetch(`${url}/proposals?jobID=${jobID}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        });
-
-        if (!res.ok) {
-            throw new Error("Failed to fetch proposals for this job");
-        }
-
-        const data = await res.json();
-        return data.proposals || [];
-    } catch (error) {
-        console.error("Error fetching proposals:", error);
-        throw error;
-    }
-}
 
 // Update proposal status
 async function updateProposalStatus(proposalId: string, status: string): Promise<IProposal> {
@@ -48,4 +27,4 @@ async function updateProposalStatus(proposalId: string, status: string): Promise
     }
 }
 
-export { getProposalByID, updateProposalStatus };
+export { updateProposalStatus };

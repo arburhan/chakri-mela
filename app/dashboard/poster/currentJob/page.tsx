@@ -3,20 +3,23 @@
 import React, { useEffect, useState } from 'react';
 import { IJobPost } from '@/models/jobPost';
 import { Button } from '@heroui/button';
-import { getActiveJobs } from '@/app/find-work/jobFetch';
+import { getActiveJobsByUser } from '@/app/find-work/jobFetch';
 import ProposalTracker from './proposalTracker';
 import { useRouter } from 'next/navigation';
 import Loading from '@/app/find-work/loading';
+import { useSession } from 'next-auth/react';
 
 
 const JobsPage = () => {
+    const { data: session } = useSession();
+    const userId = session?.user?.id;
     const [activeJobs, setActiveJobs] = useState<IJobPost[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchJobs = async () => {
             try {
-                const jobs = await getActiveJobs();
+                const jobs = await getActiveJobsByUser(userId as string);
                 setActiveJobs(jobs || []);
             } catch (error) {
                 console.error('Error fetching jobs:', error);
@@ -78,8 +81,7 @@ const JobsPage = () => {
 const JobCard = (({ job }: { job: IJobPost }) => {
     const router = useRouter();
     const handleShowProposals = (jobID: string) => {
-        console.log('Show proposals for job:', jobID);
-        // router.push(`/dashboard/poster/currentJob/${jobID}`);
+        router.push(`/dashboard/poster/currentJob/${jobID}`);
     }
     return (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all">

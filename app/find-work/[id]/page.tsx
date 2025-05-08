@@ -111,7 +111,7 @@ const JobContent = ({ job }: { job: IJobPost }) => (
     </div>
 );
 
-// Main component with streaming
+
 const JobDetailsPage = () => {
     const { data: session } = useSession();
     const params = useParams<{ id: string }>();
@@ -119,7 +119,7 @@ const JobDetailsPage = () => {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(true);
     const [job, setJob] = useState<IJobPost | null>(null);
-    // Get job ID from URL
+
 
     useEffect(() => {
         const fetchJob = async () => {
