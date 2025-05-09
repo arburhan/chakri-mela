@@ -12,7 +12,7 @@ import { MdOutlineAccessTimeFilled } from 'react-icons/md';
 import { redirect, useParams, useRouter } from 'next/navigation';
 import JobDetailsLoading from '@/components/JobDetailsLoading';
 import { useSession } from 'next-auth/react';
-import Link from 'next/link';
+
 
 const JobHeader = ({ job, handleApply, session }: { job: IJobPost, handleApply: () => void, session: any }) => (
     <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
@@ -113,6 +113,8 @@ const JobContent = ({ job }: { job: IJobPost }) => (
 
 
 const JobDetailsPage = () => {
+    // fix overflow issue
+
     const { data: session } = useSession();
     const params = useParams<{ id: string }>();
     const jobId = params.id;
@@ -120,6 +122,16 @@ const JobDetailsPage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [job, setJob] = useState<IJobPost | null>(null);
 
+    // fix overflow issue
+    useEffect(() => {
+        // Reset overflow when the component mounts
+        document.body.style.overflow = 'auto';
+
+        return () => {
+            // Reset overflow when the component unmounts
+            document.body.style.overflow = 'auto';
+        };
+    }, []);
 
     useEffect(() => {
         const fetchJob = async () => {

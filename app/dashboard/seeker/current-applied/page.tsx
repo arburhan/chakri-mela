@@ -7,12 +7,16 @@ import { IJobPost } from "@/models/jobPost";
 import { Badge, Button, Card, CardBody, CardFooter, CardHeader } from "@heroui/react";
 import moment from "moment";
 import { useSession } from "next-auth/react";
+
+import { useRouter } from "next/navigation";
+
 import { useEffect, useState } from "react";
 import { FaClock, FaMapPin } from "react-icons/fa";
 import { FaX } from "react-icons/fa6";
 import { RiWallet2Fill } from "react-icons/ri";
 
 const CurrentApplied = () => {
+    const router = useRouter();
     const { data: session, status } = useSession();
     const [isLoading, setIsLoading] = useState(true);
     const [currentJobs, setCurrentJobs] = useState<IJobPost[]>([]);
@@ -159,7 +163,7 @@ const CurrentApplied = () => {
                                                 Posted {new Date(job.createdAt).toLocaleDateString()}
                                             </span>
                                             <Button
-                                                onPress={() => window.open(`/find-work/${job._id}`, "_blank")}
+                                                onPress={() => router.push(`/find-work/${job._id}`)}
                                                 variant="ghost"
                                                 size="sm"
                                                 className="text-primary-600 hover:bg-primary-50"
@@ -174,7 +178,7 @@ const CurrentApplied = () => {
                     </div>
                 )}
             </div>
-        </div>
+        </div >
     );
 };
 
