@@ -19,3 +19,16 @@
 2. poster
 2.1 seeker id
 2.2 reviews [id, rating, comment]
+
+
+3. workhistory seeker
+3.1 postId 
+3.2 reviews [id, rating, comment]
+
+** functionalities of update proposal status (job poster) **
+1. update proposal status => (job id, seeker id, proposal id, status == send backend => find job with jobid, then find proposal with proposal id, then update status && update proposal status in seeker work history)
+
+
+** proposal mistakely i added postid, later i removed it.
+
+** jobposts e job id double ache delete korte hobe 

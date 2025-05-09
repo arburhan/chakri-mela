@@ -7,7 +7,7 @@ const url = `${process.env.NEXT_PUBLIC_API_URL}`;
 // Update proposal status
 async function updateProposalStatus(proposalId: string, status: string): Promise<IProposal> {
     try {
-        const res = await fetch(`${url}/proposals/status`, {
+        const res = await fetch(`${url}/job`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',

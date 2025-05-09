@@ -3,8 +3,11 @@ import mongoose from "mongoose";
 import connectDB from "@/utils/connectDB";
 import { NextRequest, NextResponse } from "next/server";
 import JobPostSchema from "@/models/jobPost";
+import userSchema from "@/models/user";
+import IWorkHistory from "@/models/workHistory";
 import IJobPost from "@/models/jobPost";
 import { getToken } from "next-auth/jwt";
+
 
 
 export async function GET(request: Request) {
@@ -298,19 +301,20 @@ export async function PATCH(request: Request) {
 
         // Parse the request body
         const body = await request.json();
-        const { jobID, seekerID, status } = body;
+        const { jobID, proposalId, status } = body;
 
         // Validate required fields
-        if (!seekerID || !mongoose.Types.ObjectId.isValid(seekerID)) {
+        if (!jobID || !mongoose.Types.ObjectId.isValid(jobID)) {
             return NextResponse.json(
-                { error: "Valid seeker ID is required" },
+                { error: "Valid job ID is required" },
                 { status: 400 }
             );
         }
 
-        if (!jobID || !mongoose.Types.ObjectId.isValid(jobID)) {
+
+        if (!proposalId || !mongoose.Types.ObjectId.isValid(proposalId)) {
             return NextResponse.json(
-                { error: "Valid job ID is required" },
+                { error: "Valid proposal ID is required" },
                 { status: 400 }
             );
         }
@@ -322,55 +326,61 @@ export async function PATCH(request: Request) {
             );
         }
 
-        // Update the proposal status
-        const updatedJobPost = await JobPostSchema.findOneAndUpdate(
-            {
-                _id: jobID,
-                "proposals.seekerID": new mongoose.Types.ObjectId(seekerID)
-            },
-            {
-                $set: {
-                    "proposals.$.status": status
-                }
-            },
-            { new: true }
-        );
+        // Find the job post first to make sure it exists
+        const jobPost = await JobPostSchema.findById(jobID);
 
-        if (!updatedJobPost) {
+
+        if (!jobPost) {
             return NextResponse.json(
-                { error: "Job post not found or proposal not found" },
+                { error: "Job post not found" },
                 { status: 404 }
             );
         }
 
-        // If status is accepted, reject all other proposals
-        if (status === 'accepted') {
-            await JobPostSchema.findByIdAndUpdate(
-                jobID,
-                {
-                    $set: {
-                        "proposals.$[elem].status": "rejected"
-                    }
-                },
-                {
-                    arrayFilters: [{
-                        "elem.seekerID": { $ne: new mongoose.Types.ObjectId(seekerID) }
-                    }],
-                    new: true
-                }
+        // Find the proposal in the job post
+        const proposalIndex = jobPost.proposals.findIndex(
+            proposal => proposal._id.toString() === proposalId
+        );
+
+        if (proposalIndex === -1) {
+            return NextResponse.json(
+                { error: "Proposal not found in the job post" },
+                { status: 404 }
             );
         }
 
-        // Find the updated proposal to return
-        const updatedProposal = updatedJobPost.proposals.find(
-            (proposal) => proposal.seekerID.toString() === seekerID.toString()
-        );
+        // Update the specific proposal's status
+        jobPost.proposals[proposalIndex].status = status;
+
+        // If status is accepted, reject all other proposals
+        if (status === 'accepted') {
+            jobPost.proposals.forEach((proposal, index) => {
+                if (index !== proposalIndex) {
+                    proposal.status = 'rejected';
+                }
+            });
+
+            const addToWorkHistory = await IWorkHistory.create({
+                jobID: jobPost._id,
+                review:
+                {
+                    rating: 0,
+                    comment: "No review yet"
+                }
+
+            });
+            console.log("Work history created:", addToWorkHistory);
+
+        }
+
+        // Save the updated job post
+        await jobPost.save();
 
         return NextResponse.json(
             {
                 message: "Proposal status updated successfully",
-                proposal: updatedProposal,
-                jobPost: updatedJobPost
+                proposal: jobPost.proposals[proposalIndex],
+                jobPost: jobPost
             },
             { status: 200 }
         );
@@ -382,4 +392,3 @@ export async function PATCH(request: Request) {
         );
     }
 }
-
