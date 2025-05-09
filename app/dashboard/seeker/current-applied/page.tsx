@@ -82,7 +82,7 @@ const CurrentApplied = () => {
                             return (
                                 <Card
                                     key={job._id}
-                                    className="hover:shadow-xl transition-all duration-300 border border-gray-200"
+                                    className="hover:shadow-xl transition-all duration-300 border border-gray-200 bg-stone-800"
                                 >
                                     <CardHeader className="pb-4">
                                         <div className="flex justify-between items-start space-x-4 text-white">

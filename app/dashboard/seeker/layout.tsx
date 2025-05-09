@@ -66,7 +66,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                     <li className="flex items-center">
                         <GiRunningNinja className='mr-2' />
                         <Link
-                            href="/logout"
+                            href="/dashboard/seeker/active-job"
                             className="text-gray-200 hover:text-white"
                             onClick={closeSidebar}
                         >
