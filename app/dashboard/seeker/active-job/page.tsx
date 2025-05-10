@@ -104,8 +104,8 @@ const ActiveJobSeeker = () => {
                                     </div>
                                 </div>
                                 <div className="bg-gray-50 px-6 py-3 border-t text-center">
-                                    <Button onPress={() => router.push(`/find-work/${job?._id}`)} >
-                                        View Project Details
+                                    <Button onPress={() => router.push(`/find-work/${job?._id}/apply`)} >
+                                        View Proposal
                                     </Button>
 
                                 </div>

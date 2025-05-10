@@ -8,13 +8,14 @@ interface ISalaryRange {
 }
 
 // Interface for proposal
-interface IProposal {
+export interface IProposal {
     _id: mongoose.Types.ObjectId;
     coverLetter: string;
     bidAmount: number;
     jobID: mongoose.Types.ObjectId;
     seekerID: mongoose.Types.ObjectId;
     status: string;
+    hiredAt: Date | null;
 }
 
 // Interface for job post document
@@ -34,10 +35,13 @@ export interface IJobPost extends Document {
         state: string;
         country: string;
     };
+    isFeatured: boolean;
+    isUrgent: boolean;
     proposals: IProposal[];
     posterID: mongoose.Schema.Types.ObjectId;
     createdAt: Date;
     updatedAt: Date;
+    isReviewed: boolean;
 }
 
 // Schema for job post
@@ -104,6 +108,14 @@ const JobPostSchema: Schema = new Schema({
             required: true,
         },
     },
+    isFeatured: {
+        type: Boolean,
+        default: false,
+    },
+    isUrgent: {
+        type: Boolean,
+        default: false,
+    },
     proposals: [
         {
             _id: {
@@ -134,12 +146,24 @@ const JobPostSchema: Schema = new Schema({
                 default: "pending",
                 required: true,
             },
+            hiredAt: {
+                type: Date,
+                default: null,
+            },
         },
     ],
     posterID: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: true,
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now,
+    },
+    isReviewed: {
+        type: Boolean,
+        default: false,
     },
 }, {
     timestamps: true,
@@ -150,6 +174,6 @@ JobPostSchema.pre("save", function (next) {
     next();
 });
 
-const JobPost = (mongoose.models.JobPost as Model<IJobPost>) || mongoose.model<IJobPost>("JobPost", JobPostSchema);
+const JobPost = mongoose.models?.JobPost || mongoose.model<IJobPost>("JobPost", JobPostSchema);
 
 export default JobPost;

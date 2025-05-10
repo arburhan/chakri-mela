@@ -163,12 +163,12 @@ const CurrentApplied = () => {
                                                 Posted {new Date(job.createdAt).toLocaleDateString()}
                                             </span>
                                             <Button
-                                                onPress={() => router.push(`/find-work/${job._id}`)}
+                                                onPress={() => router.push(`/find-work/${job._id}/apply`)}
                                                 variant="ghost"
                                                 size="sm"
                                                 className="text-primary-600 hover:bg-primary-50"
                                             >
-                                                View Details
+                                                View Proposal
                                             </Button>
                                         </div>
                                     </CardFooter>

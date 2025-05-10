@@ -37,7 +37,7 @@ const workHistorySchema = new mongoose.Schema<IWorkHistory>({
     }
 
 }, { timestamps: true });
-const WorkHistory = (mongoose.models.workHistory as Model<IWorkHistory>) || mongoose.model<IWorkHistory>("WorkHistory", workHistorySchema);
+const WorkHistory = mongoose.models.WorkHistory || mongoose.model<IWorkHistory>("WorkHistory", workHistorySchema);
 export default WorkHistory;
 
 
