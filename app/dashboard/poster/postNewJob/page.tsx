@@ -248,8 +248,8 @@ const Page = () => {
                                 value={formData.jobType}
                                 onChange={(e) => handleSelectChange("jobType", e.target.value)}
                             >
-                                {jobTypeData.map((type, index) => (
-                                    <SelectItem key={index} data-value={type.name}>{type.name}</SelectItem>
+                                {jobTypeData.map((type) => (
+                                    <SelectItem key={type.name} data-value={type.name}>{type.name}</SelectItem>
                                 ))}
                             </Select>
                         </div>

@@ -50,7 +50,7 @@ export async function POST(req: Request) {
             jobLevel,
             jobCategory,
             skills,
-            status: "active",
+            jobStatus: "active",
             jobLocation,
             posterID,
         });

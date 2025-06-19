@@ -1,5 +1,5 @@
 /* eslint-disable */
-'use client';
+'use client'
 import Link from 'next/link';
 import { useState } from 'react';
 import { FaHome, FaUser, FaCog } from 'react-icons/fa';

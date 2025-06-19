@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import type { IJobPost } from '@/models/jobPost';
 import { useRouter } from 'next/navigation';
 import { getActiveJobs } from '@/app/find-work/jobFetch';
+import { Chip } from '@heroui/react';
 
 
 const FeatureJobs = () => {
@@ -17,7 +18,8 @@ const FeatureJobs = () => {
         const fetchJobs = async () => {
             try {
                 const allJobs = await getActiveJobs();
-                const filteredJobs = allJobs.filter((job) => job.status === 'active').slice(0, 6);
+                console.log(allJobs);
+                const filteredJobs = allJobs.filter((job) => job.jobStatus === 'active').slice(0, 6);
                 setActiveJobs(filteredJobs);
             } catch (error) {
                 console.error("Error fetching jobs:", error);
@@ -39,7 +41,12 @@ const FeatureJobs = () => {
                 <div className="container mx-auto px-4">
                     <h2 className="text-3xl font-bold mb-8">Featured Jobs</h2>
                     <div className="flex justify-center items-center h-40">
-                        <p>Loading jobs...</p>
+                        <div className="flex items-center space-x-2">
+                            <div className="w-4 h-4 bg-blue-500 rounded-full animate-bounce"></div>
+                            <div className="w-4 h-4 bg-blue-500 rounded-full animate-bounce delay-200"></div>
+                            <div className="w-4 h-4 bg-blue-500 rounded-full animate-bounce delay-400"></div>
+                        </div>
+                        <p className="ml-4">Loading jobs...</p>
                     </div>
                 </div>
             </section>
@@ -61,7 +68,7 @@ const FeatureJobs = () => {
                             <div className="flex items-start justify-between mb-4">
                                 <div>
                                     <h3 className="font-semibold mb-2">{job.jobTitle}</h3>
-                                    <p className="text-gray-600 text-sm mb-2">Job Type: {job.jobType}</p>
+                                    <p className="text-gray-600 text-sm mb-2">Job Type: {job?.jobType}</p>
                                 </div>
                                 <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
                                     ${job.salaryRange.startRange}-${job.salaryRange.endRange}/hr
@@ -72,10 +79,10 @@ const FeatureJobs = () => {
                             </p>
 
                             <div className="flex flex-wrap gap-2">
-                                {job.skills.map((skill, index) => (
-                                    <span key={`${job._id}-skill-${index}`} className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">
+                                {job?.skills.map((skill: string, index: number) => (
+                                    <Chip key={index} size="sm" >
                                         {skill}
-                                    </span>
+                                    </Chip>
                                 ))}
                             </div>
                         </div>

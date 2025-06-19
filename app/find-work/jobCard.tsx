@@ -19,7 +19,7 @@ const JobCard = ({ job }: JobCardProps) => {
     const modalRef = useRef<HTMLDivElement>(null);
 
     // Handle job view modal
-    const handleJobView = (jobId: string) => {
+    const handleJobView = () => {
         setIsModalOpen(true);
         document.body.style.overflow = 'hidden';
     };
@@ -50,11 +50,12 @@ const JobCard = ({ job }: JobCardProps) => {
         }
 
         return () => {
+            // Reset overflow when the component unmounts
+            document.body.style.overflow = 'auto';
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [isModalOpen]);
 
-    // Handle ESC key to close modal
     useEffect(() => {
         const handleEscKey = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
@@ -67,6 +68,8 @@ const JobCard = ({ job }: JobCardProps) => {
         }
 
         return () => {
+            // Reset overflow when the component unmounts
+            document.body.style.overflow = 'auto';
             document.removeEventListener('keydown', handleEscKey);
         };
     }, [isModalOpen]);
@@ -113,7 +116,7 @@ const JobCard = ({ job }: JobCardProps) => {
                             Posted {moment(job.createdAt).fromNow()}
                         </span>
                     </div>
-                    <Button onPress={() => handleJobView(job._id)}>View Details</Button>
+                    <Button onPress={() => handleJobView()}>View Details</Button>
                 </div>
             </div>
 

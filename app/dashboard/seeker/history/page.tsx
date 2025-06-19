@@ -3,15 +3,17 @@
 import React, { useEffect, useState } from 'react';
 import { IJobPost } from '@/models/jobPost';
 import { Button } from '@heroui/button';
-import ProposalTracker from './proposalTracker';
+
 import { useRouter } from 'next/navigation';
 import Loading from '@/app/find-work/loading';
 import { useSession } from 'next-auth/react';
-import { getActiveJobsByPoster } from '@/app/find-work/jobFetch';
+import { getCompletedJobsByPoster } from '@/app/find-work/jobFetch';
+import { getWorkHistory } from '../fetchWorkhistory';
 
 
 
-const JobsPage = () => {
+
+const HistoryPage = () => {
     const { data: session } = useSession();
     const userId = session?.user?.id;
     const [activeJobs, setActiveJobs] = useState<IJobPost[]>([]);
@@ -19,11 +21,13 @@ const JobsPage = () => {
     const router = useRouter();
 
     useEffect(() => {
+        if (!userId) return; // Wait for userId to be available
         const fetchJobs = async () => {
-            if (!userId) return; // Wait for userId to be available
             try {
-                const jobs = await getActiveJobsByPoster(userId as string);
-                setActiveJobs(jobs || []);
+                const jobs = await getWorkHistory();
+                // If jobs is IUser[], map or filter to IJobPost[]
+                const jobPosts: IJobPost[] = (jobs as unknown as IJobPost[]) || [];
+                setActiveJobs(jobPosts);
             } catch (error) {
                 console.error('Error fetching jobs:', error);
             } finally {
@@ -44,10 +48,10 @@ const JobsPage = () => {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-8">
                 <div className="text-2xl font-semibold text-gray-600 mb-4">
-                    No active jobs found
+                    No completed jobs found
                 </div>
-                <Button color="primary" size="lg" onPress={() => router.push('/dashboard/poster/postNewJob')} className="mt-4">
-                    Post a New Job
+                <Button color="primary" size="lg" onPress={() => router.push('/find-work')} className="mt-4">
+                    Find new job
                 </Button>
             </div>
         );
@@ -56,24 +60,19 @@ const JobsPage = () => {
     return (
         <div className="min-h-screen bg-gray-50">
             <div className="container mx-auto px-4 py-8">
-                <div className="flex flex-col lg:flex-row gap-8">
-                    <div className="lg:w-2/3">
-                        <div className="flex justify-between items-center mb-8">
-                            <h1 className="text-3xl font-bold text-gray-800">Your Active Jobs</h1>
-                            <div className="text-sm text-gray-500">
-                                {activeJobs.length} {activeJobs.length === 1 ? 'job' : 'jobs'} active
-                            </div>
-                        </div>
+                <div className="flex flex-col lg:flex-wrap gap-8">
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {activeJobs.map((job) => (
-                                <JobCard key={job._id} job={job} />
-                            ))}
+                    <div className="flex justify-between items-center mb-8">
+                        <h1 className="text-3xl font-bold text-gray-800">Your completed jobs</h1>
+                        <div className="text-sm text-gray-500 text-right">
+                            {activeJobs.length} {activeJobs.length === 1 ? 'job' : 'jobs'} Completed
                         </div>
                     </div>
 
-                    <div className="lg:w-1/3">
-                        <ProposalTracker jobs={activeJobs} />
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {activeJobs.map((job) => (
+                            <JobCard key={job._id} job={job} />
+                        ))}
                     </div>
                 </div>
             </div>
@@ -83,8 +82,8 @@ const JobsPage = () => {
 
 const JobCard = (({ job }: { job: IJobPost }) => {
     const router = useRouter();
-    const handleShowProposals = (jobID: string) => {
-        router.push(`/dashboard/poster/currentJob/${jobID}`);
+    const showJobDetails = (jobID: string) => {
+        router.push(`/find-work/${jobID}`);
     }
     return (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all">
@@ -109,8 +108,8 @@ const JobCard = (({ job }: { job: IJobPost }) => {
                 </div>
 
                 <div className="flex flex-col space-y-3">
-                    <Button onPress={() => handleShowProposals(job?._id)} color="secondary" size="sm" className="w-full mt-6">
-                        View Proposals
+                    <Button onPress={() => showJobDetails(job?._id)} color="secondary" size="sm" className="w-full mt-6">
+                        Details
                     </Button>
                 </div>
             </div>
@@ -118,4 +117,4 @@ const JobCard = (({ job }: { job: IJobPost }) => {
     );
 });
 
-export default JobsPage;
+export default HistoryPage;

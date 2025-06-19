@@ -11,7 +11,7 @@ const ActiveWorks = async () => {
     return (
         <div className="space-y-6">
             {jobs.map((job: IJobPost) => (
-                <JobCard key={job.id} job={job} />
+                <JobCard key={job?.id} job={job} />
             ))}
         </div>
     );

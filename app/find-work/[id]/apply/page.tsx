@@ -11,6 +11,11 @@ import { MdDelete } from 'react-icons/md';
 import { useParams, useRouter } from 'next/navigation';
 import { IJobPost } from '@/models/jobPost';
 import { getJobById } from '../../jobFetch';
+import { useSession } from 'next-auth/react';
+import moment from 'moment';
+import SingleDetailsLoading from './singleDetailsLoading';
+
+
 
 // JobDetails component to be loaded with Suspense
 interface JobDetailsProps {
@@ -47,7 +52,7 @@ const JobDetails: React.FC<JobDetailsProps> = ({ jobDetails }) => {
 
                 <div className="flex items-center gap-2">
                     <FaCalendarDays size={16} />
-                    <span>Posted {new Date(jobDetails?.createdAt || '').toLocaleDateString()}</span>
+                    <span>Posted: {moment(jobDetails?.createdAt).format('MMMM Do YYYY, h:mm a')} </span>
                 </div>
                 <div className="flex items-center gap-2">
                     <BiCategory />
@@ -81,33 +86,10 @@ const JobDetails: React.FC<JobDetailsProps> = ({ jobDetails }) => {
     );
 };
 
-// Loading fallback for JobDetails
-const JobDetailsLoading = () => (
-    <Card className="sticky top-8 animate-pulse">
-        <CardHeader>
-            <div className="h-6 bg-gray-200 rounded w-1/3"></div>
-        </CardHeader>
-        <Divider />
-        <CardBody className="space-y-4">
-            <div className="h-5 bg-gray-200 rounded w-3/4"></div>
-            <div className="h-16 bg-gray-200 rounded w-full"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/3"></div>
-            <div className="h-4 bg-gray-200 rounded w-2/5"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-            <div>
-                <div className="h-4 bg-gray-200 rounded w-1/6 mb-2"></div>
-                <div className="flex flex-wrap gap-2">
-                    <div className="h-6 bg-gray-200 rounded w-16"></div>
-                    <div className="h-6 bg-gray-200 rounded w-20"></div>
-                    <div className="h-6 bg-gray-200 rounded w-24"></div>
-                </div>
-            </div>
-        </CardBody>
-    </Card>
-);
-
 const SubmitProposal: React.FC = () => {
+    const { data: session } = useSession();
+    const userID = session?.user?.id;
+
     const router = useRouter();
     const params = useParams<{ id: string }>();
     const jobId = params.id;
@@ -125,9 +107,10 @@ const SubmitProposal: React.FC = () => {
     const [existingProposal, setExistingProposal] = useState<any>(null);
     const [hasApplied, setHasApplied] = useState<boolean>(false);
     const [isEditing, setIsEditing] = useState<boolean>(false);
+    const [isWithdrawing, setIsWithdrawing] = useState<boolean>(false);
 
-    // State to store form submission data
-    const [submissionData, setSubmissionData] = useState<any>(null);
+    // Add a key for tracking page refreshes
+    const [refreshKey, setRefreshKey] = useState<number>(0);
 
     // Fetch job details
     useEffect(() => {
@@ -138,9 +121,6 @@ const SubmitProposal: React.FC = () => {
             try {
                 const response = await getJobById(jobId as string);
                 setJobDetails(response);
-
-                // Check if user has already applied
-                await checkProposalStatus();
             } catch (error) {
                 console.error("Failed to fetch job details:", error);
                 setError("Failed to load job details. Please try again.");
@@ -150,24 +130,24 @@ const SubmitProposal: React.FC = () => {
         };
 
         fetchJobDetails();
-    }, [jobId]);
+    }, [jobId, refreshKey]); // Added refreshKey to dependency array
 
-    const checkProposalStatus = async () => {
-        try {
-            const url = `${process.env.NEXT_PUBLIC_API_URL}/proposal?jobID=${jobId}`;
-            const response = await fetch(url);
-            const data = await response.json();
+    // Check if the user has an existing proposal
+    useEffect(() => {
+        if (userID && jobDetails) {
+            const seekerProposal = jobDetails?.proposals?.find((proposal) => proposal?.seekerID?.toString() === userID);
 
-            if (response.ok && data.hasApplied) {
+            if (seekerProposal) {
                 setHasApplied(true);
-                setExistingProposal(data.proposal);
-                setBidAmount(data.proposal.bidAmount.toString());
-                setCoverLetter(data.proposal.coverLetter);
+                setExistingProposal(seekerProposal);
+                setBidAmount(seekerProposal?.bidAmount?.toString() || '');
+                setCoverLetter(seekerProposal?.coverLetter || '');
+            } else {
+                setHasApplied(false);
+                setExistingProposal(null);
             }
-        } catch (error) {
-            console.error("Failed to check proposal status:", error);
         }
-    };
+    }, [userID, jobDetails]);
 
     const handleSubmitProposal = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -179,9 +159,16 @@ const SubmitProposal: React.FC = () => {
             return;
         }
 
+        // Convert bidAmount to a number before validation and submission
+        const bidAmountNum = Number(bidAmount);
+
+        if (isNaN(bidAmountNum)) {
+            setError("Bid amount must be a valid number.");
+            return;
+        }
+
         // Check if bid amount is within range
         if (jobDetails) {
-            const bidAmountNum = Number(bidAmount);
             if (bidAmountNum < jobDetails.salaryRange.startRange || bidAmountNum > jobDetails.salaryRange.endRange) {
                 setError(`Bid amount must be between ${jobDetails.salaryRange.startRange} and ${jobDetails.salaryRange.endRange}`);
                 return;
@@ -191,10 +178,10 @@ const SubmitProposal: React.FC = () => {
         setIsSubmitting(true);
 
         try {
-            let url = `${process.env.NEXT_PUBLIC_API_URL}/proposal`;
+            let url = `${process.env.NEXT_PUBLIC_API_URL}/job`;
             let method = 'POST';
             let formData: any = {
-                bidAmount,
+                bidAmount: bidAmountNum,
                 coverLetter,
                 jobID: jobId,
             };
@@ -223,15 +210,18 @@ const SubmitProposal: React.FC = () => {
                 // Update UI based on whether it was a new submission or edit
                 if (isEditing) {
                     setSuccessMessage('Proposal updated successfully!');
+                    // Update existing proposal with new data
                     setExistingProposal(data.proposal);
                 } else {
                     setSuccessMessage('Proposal submitted successfully!');
-                    setSubmissionData(formData);
-                    setHasApplied(true);
                     setExistingProposal(data.proposal);
                 }
 
+                setHasApplied(true);
                 setIsEditing(false);
+
+                // Refresh the data to ensure everything is in sync
+                setRefreshKey(prev => prev + 1);
             } else {
                 setError(data.error || 'Submission failed. Please try again.');
             }
@@ -249,19 +239,48 @@ const SubmitProposal: React.FC = () => {
         setSuccessMessage('');
     };
 
+    const handleCancelEdit = () => {
+        setIsEditing(false);
+        // Reset form values to existing proposal values
+        if (existingProposal) {
+            setBidAmount(existingProposal.bidAmount.toString());
+            setCoverLetter(existingProposal.coverLetter);
+        }
+        setError('');
+        setSuccessMessage('');
+    };
+
     const handleWithdrawProposal = async () => {
+        if (!existingProposal?._id) {
+            setError("Cannot find proposal to withdraw.");
+            onClose();
+            return;
+        }
+
+        setIsWithdrawing(true);
+
         try {
-            const url = `${process.env.NEXT_PUBLIC_API_URL}/proposal?proposalId=${existingProposal._id}`;
-            const response = await fetch(url, { method: 'DELETE' });
+            // Update the URL to include both jobID and proposalId
+            const url = `${process.env.NEXT_PUBLIC_API_URL}/job?jobID=${jobId}&proposalId=${existingProposal._id}`;
+            const response = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            });
 
             if (response.ok) {
+                // Clear user proposal state
                 setHasApplied(false);
                 setExistingProposal(null);
+                // Reset form fields for new submission
                 setBidAmount('');
                 setCoverLetter('');
-                setSubmissionData(null);
                 setSuccessMessage('Proposal withdrawn successfully!');
-                onClose(); // Close the confirmation modal
+                onClose();
+                // Refresh the job details to update the UI
+                setRefreshKey(prev => prev + 1);
             } else {
                 const data = await response.json();
                 setError(data.error || 'Failed to withdraw proposal. Please try again.');
@@ -269,7 +288,36 @@ const SubmitProposal: React.FC = () => {
         } catch (error) {
             console.error("Failed to withdraw proposal:", error);
             setError("Failed to withdraw proposal. Please try again.");
+        } finally {
+            setIsWithdrawing(false);
         }
+    };
+
+    // Show notification at the top when user has already applied
+    const renderApplicationStatus = () => {
+        if (!hasApplied) return null;
+
+        return (
+            <Card className="mb-6 bg-green-50 border border-green-200">
+                <CardBody>
+                    <div className="flex items-center">
+                        <div className="mr-3">
+                            <div className="bg-green-100 p-2 rounded-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-600" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 className="font-medium text-green-800">You've already applied to this job</h3>
+                            <p className="text-sm text-green-600">
+                                You can view, edit or withdraw your proposal below
+                            </p>
+                        </div>
+                    </div>
+                </CardBody>
+            </Card>
+        );
     };
 
     const renderSubmissionForm = () => (
@@ -277,7 +325,7 @@ const SubmitProposal: React.FC = () => {
             <Card className="mb-8">
                 <CardHeader className="flex justify-between items-center">
                     <h2 className="text-xl font-bold">
-                        {isEditing ? 'Edit Proposal' : 'Proposal Details'}
+                        {isEditing ? 'Edit Proposal' : hasApplied ? 'Your Proposal' : 'Submit Proposal'}
                     </h2>
                     {hasApplied && !isEditing && (
                         <div className="flex gap-2">
@@ -299,6 +347,15 @@ const SubmitProposal: React.FC = () => {
                             </Button>
                         </div>
                     )}
+                    {isEditing && (
+                        <Button
+                            color="default"
+                            variant="light"
+                            onPress={handleCancelEdit}
+                        >
+                            Cancel
+                        </Button>
+                    )}
                 </CardHeader>
                 <Divider />
                 <CardBody className="space-y-6">
@@ -313,7 +370,7 @@ const SubmitProposal: React.FC = () => {
                         </div>
                     )}
 
-                    {/* Budget section */}
+                    {/* Bid amount section */}
                     <div>
                         <h3 className="text-lg font-semibold mb-4">What is your bid for this project?</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -356,11 +413,41 @@ const SubmitProposal: React.FC = () => {
                             Your cover letter is the first thing the client will see. Make sure to introduce yourself, explain how your skills are relevant, and show your enthusiasm for the project.
                         </p>
                     </div>
+
+                    {/* If user has already applied and not editing, show application info */}
+                    {hasApplied && !isEditing && (
+                        <div className="border-t pt-4 mt-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <p className="text-sm text-gray-500">Submitted on</p>
+                                    <p className="font-medium">
+                                        {moment(existingProposal?.createdAt).format('MMMM Do YYYY, h:mm a')}
+                                    </p>
+                                </div>
+                                {existingProposal?.updatedAt && existingProposal?.updatedAt !== existingProposal?.createdAt && (
+                                    <div>
+                                        <p className="text-sm text-gray-500">Last updated</p>
+                                        <p className="font-medium">{new Date(existingProposal?.updatedAt).toLocaleString()}</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </CardBody>
             </Card>
 
+            {/* Show the submit/update button only when appropriate */}
             {(!hasApplied || isEditing) && (
-                <div className="flex justify-end">
+                <div className="flex justify-end gap-2">
+                    {isEditing && (
+                        <Button
+                            color="default"
+                            variant="flat"
+                            onPress={handleCancelEdit}
+                        >
+                            Cancel
+                        </Button>
+                    )}
                     <Button
                         color="primary"
                         type="submit"
@@ -375,69 +462,13 @@ const SubmitProposal: React.FC = () => {
         </form>
     );
 
-    const renderSubmissionDetails = () => {
-        // This would show if a user has already submitted and is viewing their submission
-        if (!hasApplied || isEditing) return null;
-
-        return (
-            <Card className="mb-8 bg-blue-50">
-                <CardHeader className="flex justify-between items-center">
-                    <h2 className="text-xl font-bold text-blue-700">Your Proposal</h2>
-                    <div className="flex gap-2">
-                        <Button
-                            color="primary"
-                            variant="flat"
-                            startContent={<BiEdit size={16} />}
-                            onPress={handleEditProposal}
-                        >
-                            Edit
-                        </Button>
-                        <Button
-                            color="danger"
-                            variant="flat"
-                            startContent={<MdDelete size={16} />}
-                            onPress={onOpen}
-                        >
-                            Withdraw
-                        </Button>
-                    </div>
-                </CardHeader>
-                <CardBody>
-                    <div className="space-y-4">
-                        <div>
-                            <h3 className="text-sm font-semibold text-blue-700">Bid Amount</h3>
-                            <p className="text-lg font-bold text-black">${existingProposal?.bidAmount}</p>
-                        </div>
-
-                        <div>
-                            <h3 className="text-sm font-semibold text-blue-700">Cover Letter</h3>
-                            <p className="whitespace-pre-line text-black">{existingProposal?.coverLetter}</p>
-                        </div>
-
-                        <div>
-                            <h3 className="text-sm font-semibold text-blue-700">Submitted On</h3>
-                            <p className='text-black'>{new Date(existingProposal?.createdAt).toLocaleString()}</p>
-                        </div>
-
-                        {existingProposal?.updatedAt && existingProposal?.updatedAt !== existingProposal?.createdAt && (
-                            <div>
-                                <h3 className="text-sm font-semibold text-blue-700">Last Updated</h3>
-                                <p>{new Date(existingProposal?.updatedAt).toLocaleString()}</p>
-                            </div>
-                        )}
-                    </div>
-                </CardBody>
-            </Card>
-        );
-    };
-
     return (
         <div className="container mx-auto px-4 py-8">
             {/* Breadcrumbs */}
             <Breadcrumbs className="mb-6">
                 <BreadcrumbItem href="/find-work">Jobs</BreadcrumbItem>
                 <BreadcrumbItem href={`/find-work/${jobId}`}>{jobDetails?.jobTitle || "Job Details"}</BreadcrumbItem>
-                <BreadcrumbItem>Submit Proposal</BreadcrumbItem>
+                <BreadcrumbItem>{hasApplied ? "Your Proposal" : "Submit Proposal"}</BreadcrumbItem>
             </Breadcrumbs>
 
             {/* Back button */}
@@ -450,72 +481,21 @@ const SubmitProposal: React.FC = () => {
                 Back to Job
             </Button>
 
-            {/* Display submission data if available */}
-            {submissionData && !isEditing && (
-                <Card className="mb-8 bg-green-50">
-                    <CardHeader className="flex justify-between items-center">
-                        <h2 className="text-xl font-bold text-green-700">Proposal Submitted Successfully</h2>
-                    </CardHeader>
-                    <CardBody>
-                        <div className="space-y-2">
-                            <p><strong>Bid Amount:</strong> ${submissionData.bidAmount}</p>
-                            <p><strong>Cover Letter:</strong> {submissionData.coverLetter}</p>
-                            {submissionData.estimatedDuration && (
-                                <p><strong>Estimated Duration:</strong> {submissionData.estimatedDuration}</p>
-                            )}
-                            <p><strong>Submitted At:</strong> {new Date().toLocaleString()}</p>
-                        </div>
-                        <div className="mt-4">
-                            <Button
-                                color="primary"
-                                onPress={() => router.push('/dashboard/proposals')}
-                            >
-                                Go to My Proposals
-                            </Button>
-                        </div>
-                    </CardBody>
-                </Card>
-            )}
-
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Main content */}
-                <div className="lg:col-span-2">
-                    {isLoading ? (
-                        <Card className="mb-8 animate-pulse">
-                            <CardHeader>
-                                <div className="h-6 bg-gray-200 rounded w-1/3"></div>
-                            </CardHeader>
-                            <Divider />
-                            <CardBody className="space-y-6">
-                                <div>
-                                    <div className="h-5 bg-gray-200 rounded w-1/2 mb-4"></div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div>
-                                            <div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
-                                            <div className="h-10 bg-gray-200 rounded w-full"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="h-5 bg-gray-200 rounded w-1/3 mb-4"></div>
-                                    <div className="h-32 bg-gray-200 rounded w-full"></div>
-                                </div>
-                            </CardBody>
-                        </Card>
-                    ) : (
-                        <>
-                            {renderSubmissionDetails()}
-                            {renderSubmissionForm()}
-                        </>
-                    )}
-                </div>
+                <Suspense fallback={<SingleDetailsLoading />}>
+                    <div className="lg:col-span-2">
+                        {renderApplicationStatus()}
 
-                {/* Job Details Sidebar with Suspense */}
-                <div className="lg:col-span-1">
-                    <Suspense fallback={<JobDetailsLoading />}>
+                        {/* Show proposal form/details */}
+                        {renderSubmissionForm()}
+                    </div>
+
+                    {/* Job Details Sidebar with Suspense */}
+                    <div className="lg:col-span-1">
                         <JobDetails jobDetails={jobDetails} />
-                    </Suspense>
-                </div>
+                    </div>
+                </Suspense>
             </div>
 
             {/* Confirmation Modal for Withdrawing Proposal */}
@@ -532,6 +512,7 @@ const SubmitProposal: React.FC = () => {
                         <Button
                             color="danger"
                             onPress={handleWithdrawProposal}
+                            isLoading={isWithdrawing}
                         >
                             Withdraw Proposal
                         </Button>

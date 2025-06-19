@@ -1,7 +1,7 @@
 /* eslint-disable */
 'use client';
 import Link from 'next/link';
-import { FaHome, FaUser, FaCog, FaSignOutAlt } from 'react-icons/fa';
+import { FaHome, FaUser, FaCog, FaSignOutAlt, FaHistory } from 'react-icons/fa';
 import { useState } from 'react';
 import { RiMenu2Line } from "react-icons/ri";
 import { MdPublish } from 'react-icons/md';
@@ -72,13 +72,13 @@ const posterDashboardLayout = ({ children }: { children: React.ReactNode }) => {
                         </Link>
                     </li>
                     <li className="flex items-center">
-                        <FaUser className="mr-2" />
+                        <FaHistory className='mr-2' />
                         <Link
-                            href="/dashboard/poster/profile"
+                            href="/dashboard/poster/history"
                             className="text-gray-200 hover:text-white"
                             onClick={closeSidebar}
                         >
-                            Profile
+                            Work History
                         </Link>
                     </li>
                     <li className="flex items-center">
