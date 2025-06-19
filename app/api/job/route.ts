@@ -2,7 +2,7 @@
 import mongoose from "mongoose";
 import connectDB from "@/utils/connectDB";
 import { NextRequest, NextResponse } from "next/server";
-import JobPostSchema from "@/models/jobPost";
+import JobPostSchema, { IProposal } from "@/models/jobPost";
 import userSchema from "@/models/user";
 import IWorkHistory from "@/models/workHistory";
 import IJobPost from "@/models/jobPost";
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
             bidAmount = parseFloat(bidAmount);
         }
 
-        console.log(seekerID, jobID, bidAmount, coverLetter);
+
 
         if (!jobID || bidAmount === undefined || isNaN(bidAmount) || !coverLetter) {
             return NextResponse.json({ error: 'Please provide all required fields.' }, { status: 400 });
@@ -82,9 +82,18 @@ export async function POST(request: NextRequest) {
         }
 
         // Check if user has already submitted a proposal
-        const existingProposal = job.proposals.find(
-            proposal => proposal.seekerID.toString() === seekerID.toString()
+
+
+        interface JobWithProposals {
+            proposals: IProposal[];
+        }
+
+        const jobWithProposals = job as unknown as JobWithProposals;
+
+        const existingProposal: IProposal | undefined = jobWithProposals.proposals.find(
+            (proposal: IProposal) => proposal.seekerID.toString() === seekerID.toString()
         );
+
 
         if (existingProposal) {
             return NextResponse.json(
@@ -103,7 +112,7 @@ export async function POST(request: NextRequest) {
                         bidAmount,
                         jobID,
                         seekerID,
-                        status: 'pending',
+                        proposalStatus: 'pending',
                     }
                 }
             },
@@ -144,7 +153,7 @@ export async function PUT(request: NextRequest) {
             bidAmount = parseFloat(bidAmount);
         }
 
-        console.log(seekerID, jobID, proposalId, bidAmount, coverLetter);
+
 
         if (!jobID || !proposalId || (bidAmount === undefined && !coverLetter)) {
             return NextResponse.json({
@@ -192,9 +201,10 @@ export async function PUT(request: NextRequest) {
             }, { status: 404 });
         }
 
-        // Find the updated proposal in the array
-        const updatedProposal = updatedJob.proposals.find(
-            proposal => proposal._id.toString() === proposalId
+
+
+        const updatedProposal: IProposal | undefined = updatedJob.proposals.find(
+            (proposal: IProposal) => proposal._id.toString() === proposalId
         );
 
         return NextResponse.json({
@@ -301,7 +311,8 @@ export async function PATCH(request: Request) {
 
         // Parse the request body
         const body = await request.json();
-        const { jobID, proposalId, status } = body;
+        const { jobID, proposalId, proposalStatus, hiredAt } = body;
+
 
         // Validate required fields
         if (!jobID || !mongoose.Types.ObjectId.isValid(jobID)) {
@@ -319,7 +330,7 @@ export async function PATCH(request: Request) {
             );
         }
 
-        if (!status || !['pending', 'accepted', 'rejected'].includes(status)) {
+        if (!proposalStatus || !['pending', 'accepted', 'rejected'].includes(proposalStatus)) {
             return NextResponse.json(
                 { error: "Valid status is required (pending, accepted, or rejected)" },
                 { status: 400 }
@@ -337,9 +348,15 @@ export async function PATCH(request: Request) {
             );
         }
 
-        // Find the proposal in the job post
-        const proposalIndex = jobPost.proposals.findIndex(
-            proposal => proposal._id.toString() === proposalId
+        // Check if the proposal exists in the job post
+        interface JobPostWithProposals {
+            proposals: IProposal[];
+        }
+
+        const jobPostWithProposals = jobPost as unknown as JobPostWithProposals;
+
+        const proposalIndex: number = jobPostWithProposals.proposals.findIndex(
+            (proposal: IProposal) => proposal._id.toString() === proposalId
         );
 
         if (proposalIndex === -1) {
@@ -350,26 +367,30 @@ export async function PATCH(request: Request) {
         }
 
         // Update the specific proposal's status
-        jobPost.proposals[proposalIndex].status = status;
+        jobPost.proposals[proposalIndex].proposalStatus = proposalStatus;
+        if (proposalStatus === 'accepted') {
+            jobPost.jobStatus = "in-progress";
+            jobPost.proposals[proposalIndex].hiredAt = new Date(hiredAt);
+        }
 
         // If status is accepted, reject all other proposals
-        if (status === 'accepted') {
-            jobPost.proposals.forEach((proposal, index) => {
+        if (proposalStatus === 'accepted') {
+            jobPost.proposals.forEach((proposal: IProposal, index: number) => {
                 if (index !== proposalIndex) {
-                    proposal.status = 'rejected';
+                    proposal.proposalStatus = 'rejected';
                 }
             });
 
-            const addToWorkHistory = await IWorkHistory.create({
-                jobID: jobPost._id,
-                review:
-                {
-                    rating: 0,
-                    comment: "No review yet"
-                }
-
-            });
-            console.log("Work history created:", addToWorkHistory);
+            /*    await IWorkHistory.create({
+                   jobID: jobPost._id,
+                   review:
+                   {
+                       rating: 0,
+                       comment: "No review yet"
+                   }
+   
+               });
+               console.log("Work history created:"); */
 
         }
 

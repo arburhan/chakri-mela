@@ -46,7 +46,7 @@ const CurrentApplied = () => {
 
     const getProposalStatus = (proposals: any[], userId: string) => {
         const userProposal = proposals.find(p => p.seekerID.toString() === userId);
-        return userProposal?.status || "pending";
+        return userProposal?.proposalStatus || "pending";
     };
 
     const getProposalDetails = (proposals: any[], userId: string) => {

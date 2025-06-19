@@ -1,7 +1,7 @@
 /* eslint-disable */
 'use client';
 import Link from 'next/link';
-import { FaHome, FaUser, FaCog, FaSignOutAlt } from 'react-icons/fa';
+import { FaHome, FaUser, FaCog, FaSignOutAlt, FaHistory } from 'react-icons/fa';
 import { BiCurrentLocation } from "react-icons/bi";
 import { GiRunningNinja } from "react-icons/gi";
 
@@ -71,6 +71,16 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                             onClick={closeSidebar}
                         >
                             Active Jobs
+                        </Link>
+                    </li>
+                    <li className="flex items-center">
+                        <FaHistory className='mr-2' />
+                        <Link
+                            href="/dashboard/seeker/history"
+                            className="text-gray-200 hover:text-white"
+                            onClick={closeSidebar}
+                        >
+                            Work History
                         </Link>
                     </li>
                 </ul>

@@ -14,7 +14,7 @@ export interface IProposal {
     bidAmount: number;
     jobID: mongoose.Types.ObjectId;
     seekerID: mongoose.Types.ObjectId;
-    status: string;
+    proposalStatus: string;
     hiredAt: Date | null;
 }
 
@@ -29,7 +29,7 @@ export interface IJobPost extends Document {
     jobLevel: string[];
     jobCategory: string;
     skills: string[];
-    status: string;
+    jobStatus: string;
     jobLocation: {
         city: string;
         state: string;
@@ -88,9 +88,9 @@ const JobPostSchema: Schema = new Schema({
             required: true,
         },
     ],
-    status: {
+    jobStatus: {
         type: String,
-        enum: ["active", "completed", "expired"],
+        enum: ["active", "completed", "in-progress", "expired"],
         default: "active",
         required: true,
     },
@@ -140,7 +140,7 @@ const JobPostSchema: Schema = new Schema({
                 ref: "User",
                 required: true,
             },
-            status: {
+            proposalStatus: {
                 type: String,
                 enum: ["pending", "accepted", "rejected"],
                 default: "pending",

@@ -1,6 +1,6 @@
 /* eslint-disable */
 import type { IJobPost } from "@/models/jobPost";
-import { IProposal } from "@/models/proposal";
+
 
 interface JobData {
     jobPosts: IJobPost[];
@@ -23,7 +23,7 @@ async function getActiveJobsBySeeker(id: string): Promise<IJobPost[]> {
     }
     const activeJobsForSeeker = data.jobPosts.filter(job => {
 
-        if (job.status !== "active") return false;
+        if (job.jobStatus !== "active") return false;
         if (!job.proposals || !Array.isArray(job.proposals)) return false;
 
         return job.proposals.some((proposal) => {
@@ -48,11 +48,11 @@ async function getActiveJobsSeekerByStatus(id: string): Promise<IJobPost[]> {
     }
     const activeJobsForSeeker = data.jobPosts.filter(job => {
 
-        if (job.status !== "active") return false;
+        if (job.jobStatus !== "active") return false;
         if (!job.proposals || !Array.isArray(job.proposals)) return false;
 
         return job.proposals.some((proposal) => {
-            if (proposal.status !== "accepted") return false;
+            if (proposal.proposalStatus !== "accepted") return false;
             return proposal.seekerID?.toString() === id;
         });
     });
@@ -68,7 +68,7 @@ async function getActiveJobsByPoster(id: string): Promise<IJobPost[]> {
         throw new Error("Failed to fetch data");
     }
     const data: JobData = await res.json();
-    return data.jobPosts.filter((job) => job.status === "active" && job?.posterID?.toString() === id);
+    return data.jobPosts.filter((job) => (job.jobStatus === "active" || job.jobStatus === 'in-progress') && job?.posterID?.toString() === id);
 }
 
 async function getActiveJobs(): Promise<IJobPost[]> {
@@ -79,7 +79,7 @@ async function getActiveJobs(): Promise<IJobPost[]> {
     }
 
     const data: JobData = await res.json();
-    return data.jobPosts.filter((job) => job.status === "active");
+    return data.jobPosts.filter((job) => job.jobStatus === "active");
 }
 
 
@@ -100,4 +100,25 @@ async function getJobById(id: string): Promise<IJobPost> {
     return response.jobPost as IJobPost;
 }
 
-export { getActiveJobs, getJobById, getActiveJobsByPoster, getActiveJobsBySeeker, getActiveJobsSeekerByStatus };
+async function getRunningJobsBySeeker(id: string): Promise<IJobPost[]> {
+    if (!id) {
+        throw new Error("Seeker ID is required");
+    }
+    const res = await fetch(url + `/job`);
+
+    if (!res.ok) {
+        throw new Error("Failed to fetch data");
+    }
+    const data: JobData = await res.json();
+    return data.jobPosts.filter((job) => {
+        if (!job.proposals || !Array.isArray(job.proposals)) return false;
+        // First check if any proposal matches the seeker ID
+        const hasSeeker = job.proposals.some((proposal) => proposal.seekerID?.toString() === id);
+        if (!hasSeeker) return false;
+        // Then check if job status is 'in-progress'
+        return job.jobStatus === "in-progress";
+    });
+}
+
+
+export { getActiveJobs, getJobById, getActiveJobsByPoster, getActiveJobsBySeeker, getActiveJobsSeekerByStatus, getRunningJobsBySeeker };

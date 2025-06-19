@@ -16,6 +16,7 @@ const JobsPage = () => {
     const userId = session?.user?.id;
     const [activeJobs, setActiveJobs] = useState<IJobPost[]>([]);
     const [loading, setLoading] = useState(true);
+    const router = useRouter();
 
     useEffect(() => {
         const fetchJobs = async () => {
@@ -44,7 +45,7 @@ const JobsPage = () => {
                 <div className="text-2xl font-semibold text-gray-600 mb-4">
                     No active jobs found
                 </div>
-                <Button color="primary" size="lg">
+                <Button color="primary" size="lg" onPress={() => router.push('/dashboard/poster/postNewJob')} className="mt-4">
                     Post a New Job
                 </Button>
             </div>

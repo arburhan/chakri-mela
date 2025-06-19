@@ -1,6 +1,6 @@
 /* eslint-disable */
 'use client';
-import { getActiveJobsSeekerByStatus } from '@/app/find-work/jobFetch';
+import { getActiveJobsSeekerByStatus, getRunningJobsBySeeker } from '@/app/find-work/jobFetch';
 import Loading from '@/app/find-work/loading';
 import { IJobPost } from '@/models/jobPost';
 import { Button, Progress } from '@heroui/react';
@@ -22,7 +22,8 @@ const ActiveJobSeeker = () => {
         const fetchData = async () => {
             if (userId) {
                 try {
-                    const activeJob = await getActiveJobsSeekerByStatus(userId.toString());
+                    const activeJob = await getRunningJobsBySeeker(userId.toString());
+                    console.log(activeJob);
                     setActiveJob(activeJob);
                 } catch (error) {
                     console.error("Error fetching jobs:", error);

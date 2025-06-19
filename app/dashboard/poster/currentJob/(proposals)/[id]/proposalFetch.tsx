@@ -1,5 +1,7 @@
 /* eslint-disable */
-import { IProposal } from "@/models/proposal";
+
+import { IProposal } from "@/models/jobPost";
+
 
 const url = `${process.env.NEXT_PUBLIC_API_URL}`;
 

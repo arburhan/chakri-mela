@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     if (!job) {
         return NextResponse.json({ error: "Job not found." }, { status: 404 });
     }
-    if (job.status === "completed" || job.status === "expired") {
+    if (job.jobStatus === "completed" || job.jobStatus === "expired") {
         return NextResponse.json({ error: "Cannot send proposals to this job." }, { status: 400 });
     }
 

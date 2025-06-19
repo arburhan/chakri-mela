@@ -18,7 +18,8 @@ const FeatureJobs = () => {
         const fetchJobs = async () => {
             try {
                 const allJobs = await getActiveJobs();
-                const filteredJobs = allJobs.filter((job) => job.status === 'active').slice(0, 6);
+                console.log(allJobs);
+                const filteredJobs = allJobs.filter((job) => job.jobStatus === 'active').slice(0, 6);
                 setActiveJobs(filteredJobs);
             } catch (error) {
                 console.error("Error fetching jobs:", error);
