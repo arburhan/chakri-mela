@@ -119,6 +119,18 @@ export async function POST(request: NextRequest) {
             { new: true } // Return the updated document
         );
 
+        const addSeekerAppliedJob = await userSchema.findById(seekerID);
+        if (!addSeekerAppliedJob) {
+            return NextResponse.json({ error: "Job seeker not found" }, { status: 404 });
+        }
+        if (!Array.isArray(addSeekerAppliedJob.appliedJobs)) {
+            addSeekerAppliedJob.appliedJobs = [];
+        }
+        if (!addSeekerAppliedJob.appliedJobs.includes(jobID)) {
+            addSeekerAppliedJob.appliedJobs.push(jobID);
+            await addSeekerAppliedJob.save();
+        }
+
         if (!updatedJob) {
             return NextResponse.json({ error: 'Failed to add proposal.' }, { status: 500 });
         }
@@ -306,15 +318,15 @@ export async function DELETE(request: Request) {
 // Add a PATCH endpoint to update proposal status
 export async function PATCH(request: Request) {
     try {
-        // Connect to database
+
         await connectDB();
 
-        // Parse the request body
+
         const body = await request.json();
         const { jobID, proposalId, proposalStatus, hiredAt } = body;
 
 
-        // Validate required fields
+
         if (!jobID || !mongoose.Types.ObjectId.isValid(jobID)) {
             return NextResponse.json(
                 { error: "Valid job ID is required" },
@@ -337,7 +349,7 @@ export async function PATCH(request: Request) {
             );
         }
 
-        // Find the job post first to make sure it exists
+
         const jobPost = await JobPostSchema.findById(jobID);
 
 
@@ -380,17 +392,6 @@ export async function PATCH(request: Request) {
                     proposal.proposalStatus = 'rejected';
                 }
             });
-
-            /*    await IWorkHistory.create({
-                   jobID: jobPost._id,
-                   review:
-                   {
-                       rating: 0,
-                       comment: "No review yet"
-                   }
-   
-               });
-               console.log("Work history created:"); */
 
         }
 

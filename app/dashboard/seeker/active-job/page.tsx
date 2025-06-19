@@ -20,6 +20,7 @@ const ActiveJobSeeker = () => {
 
     useEffect(() => {
         const fetchData = async () => {
+            if (!userId) return; // Wait for userId to be available
             if (userId) {
                 try {
                     const activeJob = await getRunningJobsBySeeker(userId.toString());

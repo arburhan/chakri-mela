@@ -25,6 +25,7 @@ const CurrentApplied = () => {
 
     useEffect(() => {
         const fetchData = async () => {
+            if (!userId) return; // Wait for userId to be available
             if (userId) {
                 try {
                     const jobs = await getActiveJobsBySeeker(userId.toString());

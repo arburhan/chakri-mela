@@ -9,6 +9,7 @@ import { IJobPost, IProposal } from "@/models/jobPost";
 import { Button } from "@heroui/button";
 import { Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Textarea, useDisclosure } from "@heroui/react";
 import moment from "moment";
+import { set } from "mongoose";
 
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -35,7 +36,7 @@ const ProposalPage = () => {
 
     const [rating, setRating] = useState<number | null>(null);
     const [comment, setComment] = useState<string>("");
-
+    const [acceptedJobSeekerID, setAcceptedJobSeekerID] = useState<string>('');
 
 
 
@@ -45,7 +46,6 @@ const ProposalPage = () => {
     const currentDate = new Date();
     const jobStartDate = new Date(job?.createdAt ?? 0);
     const jobEndDate = new Date(jobStartDate.getTime() + jobProgressTime);
-
 
 
     useEffect(() => {
@@ -78,7 +78,6 @@ const ProposalPage = () => {
     }, [jobId]);
 
     const handleStatusChange = async (proposalIndex: number, newStatus: string) => {
-        console.log(newStatus);
         try {
             // Get the proposal ID from the proposals array
             const proposalId = proposals[proposalIndex]._id;
@@ -90,6 +89,12 @@ const ProposalPage = () => {
 
             // Set loading state
             setStatusUpdateLoading(true);
+            if (newStatus === 'accepted') {
+                if (proposals[proposalIndex].seekerID) {
+                    setAcceptedJobSeekerID(String(proposals[proposalIndex].seekerID));
+                }
+            }
+
 
             // Make API call to update the proposal status
             const response = await fetch(`${url}/job`, {
@@ -111,23 +116,19 @@ const ProposalPage = () => {
                 throw new Error(data.error || 'Failed to update proposal status');
             }
 
-            // Update the local state with the response data
-            if (newStatus === 'accepted') {
-                // If a proposal is accepted, update all proposals to reflect their new statuses
-                setProposals(prev => prev.map(proposal => {
-                    if (proposal._id.toString() === proposalId.toString()) {
-                        return { ...proposal, status: 'accepted' } as ProposalWithUIState;
-                    } else {
-                        return { ...proposal, status: 'rejected' } as ProposalWithUIState;
-                    }
-                }));
-            } else {
-                // For rejected or pending, only update the specific proposal
-                setProposals(prev => prev.map((proposal, i) =>
-                    i === proposalIndex ? { ...proposal, status: newStatus } as ProposalWithUIState : proposal
-                ));
-            }
+            // Refetch the job to get the latest proposals and status
+            const updatedJob = await getJobById(jobId);
+            setJob(updatedJob);
 
+            // Update proposals state with the latest proposals from the backend
+            if (updatedJob?.proposals && Array.isArray(updatedJob.proposals)) {
+                setProposals(
+                    updatedJob.proposals.map((proposal: any) => ({
+                        ...JSON.parse(JSON.stringify(proposal)),
+                        isFavorite: false
+                    }))
+                );
+            }
         } catch (error) {
             console.error("Error updating proposal status:", error);
             alert("Failed to update proposal status. Please try again.");
@@ -160,17 +161,16 @@ const ProposalPage = () => {
                 return;
             }
 
-            // Set loading state
             setStatusUpdateLoading(true);
 
-            // Make API call to mark the job as completed
             const response = await fetch(`${url}/job/complete`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    jobID: jobId,
+                    jobId,
+                    seekerID: acceptedJobSeekerID,
                     jobStatus: 'completed',
                     rating: rating,
                     comment: comment,
@@ -179,20 +179,21 @@ const ProposalPage = () => {
 
             const data = await response.json();
 
-
             if (!response.ok) {
                 throw new Error(data.error || 'Failed to mark job as completed');
             }
 
-            // Update the job status in the local state
-            setJob(data.job ?? null);
+            // Refetch the job to get the latest status
+            const updatedJob = await getJobById(jobId);
+            setJob(updatedJob);
+
         } catch (error) {
             console.error("Error marking job as completed:", error);
             alert("Failed to mark job as completed. Please try again.");
         } finally {
             setStatusUpdateLoading(false);
         }
-    }
+    };
 
     if (isLoading) {
         return <Loading />;
@@ -274,9 +275,7 @@ const ProposalPage = () => {
 
                             ))
                     }
-
                 </div>
-
                 <h2 className="text-2xl font-bold text-indigo-700 mb-6">Proposals ({proposals.length})</h2>
 
                 {statusUpdateLoading && (

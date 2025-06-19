@@ -20,6 +20,7 @@ const JobsPage = () => {
 
     useEffect(() => {
         const fetchJobs = async () => {
+            if (!userId) return; // Wait for userId to be available
             try {
                 const jobs = await getActiveJobsByPoster(userId as string);
                 setActiveJobs(jobs || []);
@@ -31,7 +32,7 @@ const JobsPage = () => {
         };
 
         fetchJobs();
-    }, []);
+    }, [userId]);
 
     if (loading) {
         return (

@@ -120,5 +120,15 @@ async function getRunningJobsBySeeker(id: string): Promise<IJobPost[]> {
     });
 }
 
+async function getCompletedJobsByPoster(id: string): Promise<IJobPost[]> {
+    const res = await fetch(url + `/job`);
 
-export { getActiveJobs, getJobById, getActiveJobsByPoster, getActiveJobsBySeeker, getActiveJobsSeekerByStatus, getRunningJobsBySeeker };
+    if (!res.ok) {
+        throw new Error("Failed to fetch data");
+    }
+    const data: JobData = await res.json();
+    return data.jobPosts.filter((job) => job.jobStatus === "completed" && job?.posterID?.toString() === id);
+}
+
+
+export { getActiveJobs, getJobById, getActiveJobsByPoster, getActiveJobsBySeeker, getActiveJobsSeekerByStatus, getRunningJobsBySeeker, getCompletedJobsByPoster };

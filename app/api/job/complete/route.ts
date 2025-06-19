@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import connectDB from "@/utils/connectDB";
 import { NextRequest, NextResponse } from "next/server";
 import JobPostSchema, { IProposal } from "@/models/jobPost";
+import IUser from "@/models/user";
 
 import IWorkHistory from "@/models/workHistory";
 
@@ -10,8 +11,7 @@ import IWorkHistory from "@/models/workHistory";
 export async function PATCH(request: Request) {
     try {
         const body = await request.json();
-        const { jobID: jobId, jobStatus, rating, comment } = body;
-        console.log("jobId:", jobId);
+        const { jobId, seekerID, jobStatus, rating, comment } = body;
 
 
         await connectDB();
@@ -23,6 +23,14 @@ export async function PATCH(request: Request) {
 
         jobPost.jobStatus = jobStatus;
         await jobPost.save();
+
+        const jobSeeker = await IUser.findById(seekerID);
+        if (!jobSeeker) {
+            return NextResponse.json({ error: "Job seeker not found" }, { status: 404 });
+        }
+        // Use push() if workHistory is an array and you want to add a new job ID
+        jobSeeker.workHistory.push(jobPost._id);
+        await jobSeeker.save();
 
         // Create work history entry
         const workHistoryEntry = await IWorkHistory.create({

@@ -32,3 +32,7 @@
 ** proposal mistakely i added postid, later i removed it.
 
 ** jobposts e job id double ache delete korte hobe 
+
+
+// job post status active কি না তা চেক করে অ্যাপ্লাই করা বা প্রপোজাল উইথড্র এইটা ইমপ্লিমেন্ট করতে হবে । 
+জব সিকার এবং পোস্টার এর প্রফাইল উন্মুক্ত এবং হিস্ট্রি দেখাতে হবে । 
