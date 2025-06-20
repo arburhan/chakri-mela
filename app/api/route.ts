@@ -1,4 +1,5 @@
 /* eslint-disable */
+export const runtime = 'nodejs';
 import connectDB from "@/utils/connectDB";
 
 export async function GET() {

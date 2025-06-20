@@ -1,5 +1,6 @@
+/* eslint-disable */
 import JobPost from '@/models/jobPost';
-import connectDB from './connectDB';
+import connectDB from "@/utils/connectDB";
 
 // Expire jobs based on conditions
 export async function expireJobs() {

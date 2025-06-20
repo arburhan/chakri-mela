@@ -1,10 +1,10 @@
 /* eslint-disable */
+export const runtime = 'nodejs';
 import mongoose from "mongoose";
 import connectDB from "@/utils/connectDB";
 import { NextRequest, NextResponse } from "next/server";
 import JobPostSchema, { IProposal } from "@/models/jobPost";
 import userSchema from "@/models/user";
-import IWorkHistory from "@/models/workHistory";
 import IJobPost from "@/models/jobPost";
 import { getToken } from "next-auth/jwt";
 
