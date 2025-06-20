@@ -2,7 +2,8 @@
 import JobPost, { IJobPost } from '@/models/jobPost';
 import IProposal from '@/models/jobPost';
 import User from '@/models/user';
-import connectDB from './connectDB';
+import connectDB from "@/utils/connectDB";
+
 
 // Enforce review requirements
 export async function enforceReviews() {
