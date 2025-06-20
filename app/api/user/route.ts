@@ -1,4 +1,5 @@
 /* eslint-disable */
+export const runtime = 'nodejs';
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/utils/connectDB";
 import User from "@/models/user";

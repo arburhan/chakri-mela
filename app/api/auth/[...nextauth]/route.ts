@@ -1,4 +1,5 @@
 /* eslint-disable */
+export const runtime = 'nodejs';
 import User from "@/models/user";
 import connectDB from "@/utils/connectDB";
 import NextAuth from "next-auth";
@@ -42,7 +43,7 @@ const authOptions: NextAuthOptions = {
 
                     // Connect to the database using your connection function
                     const mongoose = await connectDB();
-                    console.log("MongoDB connection status:", mongoose.connection.readyState);
+                    console.log("MongoDB connection status:", mongoose.readyState);
 
                     // Find the user by email and explicitly type it as IUser
                     const user = await User.findOne({

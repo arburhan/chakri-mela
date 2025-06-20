@@ -1,4 +1,5 @@
 /* eslint-disable */
+export const runtime = 'nodejs';
 import mongoose from "mongoose";
 import connectDB from "@/utils/connectDB";
 import { NextRequest, NextResponse } from "next/server";
