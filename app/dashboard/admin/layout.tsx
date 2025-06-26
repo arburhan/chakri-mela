@@ -45,7 +45,7 @@ const adminDashboardLayout = ({ children }: { children: React.ReactNode }) => {
                     <li className="flex items-center">
                         <FaUser className="mr-2" />
                         <Link
-                            href="/dashboard/profile"
+                            href="/dashboard/admin/profile"
                             className="text-gray-200 hover:text-white"
                             onClick={closeSidebar}
                         >
@@ -55,7 +55,7 @@ const adminDashboardLayout = ({ children }: { children: React.ReactNode }) => {
                     <li className="flex items-center">
                         <MdReport className="mr-2" />
                         <Link
-                            href="/dashboard/reports"
+                            href="/dashboard/admin/reports"
                             className="text-gray-200 hover:text-white"
                             onClick={closeSidebar}
                         >
@@ -66,7 +66,7 @@ const adminDashboardLayout = ({ children }: { children: React.ReactNode }) => {
                         <VscFeedback className="mr-2" />
 
                         <Link
-                            href="/dashboard/feedbacks"
+                            href="/dashboard/admin/feedbacks"
                             className="text-gray-200 hover:text-white"
                             onClick={closeSidebar}
                         >
@@ -76,7 +76,7 @@ const adminDashboardLayout = ({ children }: { children: React.ReactNode }) => {
                     <li className="flex items-center">
                         <FaCog className="mr-2" />
                         <Link
-                            href="/dashboard/settings"
+                            href="/dashboard/admin/settings"
                             className="text-gray-200 hover:text-white"
                             onClick={closeSidebar}
                         >
