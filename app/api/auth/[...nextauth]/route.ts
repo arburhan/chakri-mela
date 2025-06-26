@@ -38,6 +38,8 @@ const authOptions: NextAuthOptions = {
             async authorize(credentials) {
                 try {
                     if (!credentials?.email || !credentials?.password) {
+
+
                         throw new Error("Missing credentials");
                     }
 
