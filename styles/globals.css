@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html {
+    color: #222;
+}
+
+@media (prefers-color-scheme: dark) {
+    html {
+        color: #f3f4f6;
+    }
+}
