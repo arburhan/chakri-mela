@@ -97,7 +97,7 @@ const Hero = () => {
                                         <li
                                             key={job._id}
                                             className="px-4 py-2 hover:bg-blue-100 cursor-pointer border-b last:border-b-0"
-                                            onClick={() => handleSuggestionClick(job._id)}
+                                            onMouseDown={() => handleSuggestionClick(job._id)}
                                         >
                                             <span className="font-semibold">{job.jobTitle}</span>
                                             <span className="ml-2 text-xs text-gray-500">{job.jobType} | {job.jobCategory}</span>
