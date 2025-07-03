@@ -1,6 +1,6 @@
 /* eslint-disable */
 
-import { categoriesData } from '@/public/data';
+import { categoriesData, experienceLevels, jobTypeData } from '@/public/data';
 
 import { FaSearch } from 'react-icons/fa';
 import { FaFilter, FaMapPin } from 'react-icons/fa6';
@@ -58,10 +58,10 @@ const FindWorkPage = async () => {
                                 <div>
                                     <h3 className="font-medium mb-3">Job Type</h3>
                                     <div className="space-y-2">
-                                        {['Full-time', 'Part-time', 'Contract'].map((type: string, index: number) => (
-                                            <label key={index} className="flex items-center gap-2">
+                                        {jobTypeData.map((type, idx) => (
+                                            <label key={type?.id || idx} className="flex items-center gap-2">
                                                 <input type="checkbox" className="rounded text-blue-600" />
-                                                <span>{type}</span>
+                                                <span>{type?.name}</span>
                                             </label>
                                         ))}
                                     </div>
@@ -71,10 +71,10 @@ const FindWorkPage = async () => {
                                 <div>
                                     <h3 className="font-medium mb-3">Experience Level</h3>
                                     <div className="space-y-2">
-                                        {['Entry Level', 'Intermediate', 'Expert'].map((level: string, index: number) => (
-                                            <label key={index} className="flex items-center gap-2">
+                                        {experienceLevels.map((level, idx) => (
+                                            <label key={level?.id || idx} className="flex items-center gap-2">
                                                 <input type="checkbox" className="rounded text-blue-600" />
-                                                <span>{level}</span>
+                                                <span>{level?.name}</span>
                                             </label>
                                         ))}
                                     </div>
@@ -107,8 +107,8 @@ const FindWorkPage = async () => {
                                 >
                                     <option value="all" disabled className='text-white' >All Categories</option>
                                     {
-                                        categoriesData.map((category) => (
-                                            <option key={category.id} value={category.name}>{category.name}</option>
+                                        categoriesData.map((category, idx) => (
+                                            <option key={category.id || idx} value={category.name}>{category.name}</option>
                                         ))
                                     }
                                 </select>

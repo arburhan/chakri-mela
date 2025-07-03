@@ -146,3 +146,9 @@ export const genders = [
     { key: "female", label: "Female" },
     { key: "hijra", label: "Hijra" },
 ]
+
+export const experienceLevels = [
+    { id: 1, name: "Entry Level", description: "0-1 years of experience" },
+    { id: 2, name: "Intermediate", description: "1-3 years of experience" },
+    { id: 3, name: "Expert", description: "3+ years of experience" },
+];

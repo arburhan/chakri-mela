@@ -91,7 +91,7 @@ const JobCard = ({ job }: JobCardProps) => {
                         </p>
                         <div className="flex flex-wrap gap-2 mt-3">
                             {job.skills.slice(0, 3).map((skill, index) => (
-                                <span key={`${skill}-${index}`} className="bg-blue-50 text-blue-700 text-xs font-medium px-2.5 py-1 rounded-full">
+                                <span key={index} className="bg-blue-50 text-blue-700 text-xs font-medium px-2.5 py-1 rounded-full">
                                     {skill}
                                 </span>
                             ))}
@@ -178,7 +178,7 @@ const JobCard = ({ job }: JobCardProps) => {
                                     <h3 className="font-semibold mb-2 text-gray-700">Required Skills</h3>
                                     <div className="flex flex-wrap gap-2">
                                         {job.skills.map((skill, index) => (
-                                            <span key={`${skill}-${index}`} className="bg-blue-50 text-blue-700 text-xs font-medium px-2.5 py-1 rounded-full">
+                                            <span key={index} className="bg-blue-50 text-blue-700 text-xs font-medium px-2.5 py-1 rounded-full">
                                                 {skill}
                                             </span>
                                         ))}
@@ -189,7 +189,7 @@ const JobCard = ({ job }: JobCardProps) => {
                                     <h3 className="font-semibold mb-2 text-gray-700">Job Level</h3>
                                     <div className="flex flex-wrap gap-2">
                                         {job.jobLevel.map((level, index) => (
-                                            <span key={`${index}`} className="bg-gray-100 text-gray-700 text-xs font-medium px-2.5 py-1 rounded-full">
+                                            <span key={index} className="bg-gray-100 text-gray-700 text-xs font-medium px-2.5 py-1 rounded-full">
                                                 {level}
                                             </span>
                                         ))}
