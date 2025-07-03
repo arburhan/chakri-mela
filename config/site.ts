@@ -9,12 +9,16 @@ export const siteConfig = {
       href: "/",
     },
     {
-      label: "Docs",
-      href: "/docs",
+      label: "Jobs",
+      href: "/find-work",
     },
     {
-      label: "Pricing",
-      href: "/pricing",
+      label: "Jobs",
+      href: "/find-work",
+    },
+    {
+      label: "talent",
+      href: "/Talent",
     },
     {
       label: "Blog",
@@ -39,20 +43,12 @@ export const siteConfig = {
       href: "/projects",
     },
     {
-      label: "Team",
-      href: "/team",
+      label: "Find Work",
+      href: "/find-work",
     },
     {
-      label: "Calendar",
-      href: "/calendar",
-    },
-    {
-      label: "Settings",
-      href: "/settings",
-    },
-    {
-      label: "Help & Feedback",
-      href: "/help-feedback",
+      label: "Hire Talent",
+      href: "/hire-talent",
     },
     {
       label: "Logout",
