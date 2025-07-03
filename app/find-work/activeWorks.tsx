@@ -1,17 +1,18 @@
 /* eslint-disable */
+'use client';
 import React from 'react';
 import type { IJobPost } from '@/models/jobPost';
 import JobCard from './jobCard';
-import { getActiveJobs } from './jobFetch';
 
+interface ActiveWorksProps {
+    jobs: IJobPost[];
+}
 
-const ActiveWorks = async () => {
-    // current active jobs are locate here
-    const jobs: IJobPost[] = await getActiveJobs();
+const ActiveWorks: React.FC<ActiveWorksProps> = ({ jobs }) => {
     return (
         <div className="space-y-6">
             {jobs.map((job: IJobPost) => (
-                <JobCard key={job?.id} job={job} />
+                <JobCard key={job?._id || job?.id} job={job} />
             ))}
         </div>
     );

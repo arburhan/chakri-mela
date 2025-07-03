@@ -7,6 +7,7 @@ import moment from 'moment';
 import { FaTimes } from 'react-icons/fa';
 import { Button } from '@heroui/button';
 import { useRouter } from 'next/navigation';
+import { BiSolidCategory } from 'react-icons/bi';
 
 interface JobCardProps {
     job: IJobPost;
@@ -89,6 +90,7 @@ const JobCard = ({ job }: JobCardProps) => {
                             <FaBriefcase className="mr-2 h-4 w-4" />
                             {job.jobType}
                         </p>
+                        <p className="text-gray-600 mb-3 flex items-center"> <BiSolidCategory className="mr-2 h-4 w-4" />    {job?.jobCategory}</p>
                         <div className="flex flex-wrap gap-2 mt-3">
                             {job.skills.slice(0, 3).map((skill, index) => (
                                 <span key={index} className="bg-blue-50 text-blue-700 text-xs font-medium px-2.5 py-1 rounded-full">
