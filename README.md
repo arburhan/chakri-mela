@@ -1,4 +1,4 @@
-# Chakri Mela ##(AI generated + Human modified code and design)
+# Chakri Mela ### (AI generated + Human modified code and design)
 
 This is my 3rd year university project, named Chakri Mela. It is a platform where people can find offline jobs, job posters can post jobs, and job seekers can find jobs with time and detailed information.
 ![image](https://github.com/user-attachments/assets/ce4f6ec0-6d00-4a31-9516-2c85e2822368)
